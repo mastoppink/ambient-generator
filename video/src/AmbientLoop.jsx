@@ -52,13 +52,22 @@ export const Scene = ({ image, overlays: o, renderScale = 1, phase, grainFrame =
   const maskEl = useImageElement(waterOn ? water.mask : null);
 
   const glRef = useRef(null);
+  // A WebGL canvas cannot switch to 2D, so on failure the canvas is remounted (new key) for the fallback.
+  const [fallbackKey, setFallbackKey] = useState(0);
   useLayoutEffect(() => {
     const c = waterRef.current; if (!c || !waterOn || !imgEl || !maskEl) return;
-    if (!glRef.current || glRef.current.canvas !== c) glRef.current = { canvas: c, water: createWater(c) };
-    const gw = glRef.current.water;
-    if (gw) gw.draw({ img: imgEl, mask: featheredMask(maskEl, 960, 540), p, w: water, drops: waterDrops(p, water) });
-    else drawWater(c.getContext("2d"), p, W, H, imgEl, maskEl, water); // fallback without WebGL
-  }, [p, W, H, imgEl, maskEl, waterOn, water]);
+    if (!glRef.current || glRef.current.canvas !== c) {
+      let gw = null;
+      try { gw = createWater(c); } catch (e) { console.warn("Water shader unavailable, using simple water", e); }
+      glRef.current = { canvas: c, water: gw, failed: !gw };
+    }
+    const g = glRef.current;
+    if (g.water && !g.failed) {
+      try { g.water.draw({ img: imgEl, mask: featheredMask(maskEl, 960, 540), p, w: water, drops: waterDrops(p, water) }); return; }
+      catch (e) { console.warn("Water shader failed, using simple water", e); g.failed = true; setFallbackKey((k) => k + 1); return; }
+    }
+    drawWater(c.getContext("2d"), p, W, H, imgEl, maskEl, water); // fallback without WebGL
+  }, [p, W, H, imgEl, maskEl, waterOn, water, fallbackKey]);
   const FW = Math.round(W / 2), FH = Math.round(H / 2); // fog is soft: half resolution is invisible and 4× cheaper
 
   useLayoutEffect(() => {
@@ -95,7 +104,7 @@ export const Scene = ({ image, overlays: o, renderScale = 1, phase, grainFrame =
       <Img maxRetries={6} delayRenderTimeoutInMilliseconds={120000} src={src} style={{
         ...fill, objectFit: "cover", transform: `scale(${scale})`,
       }} />
-      {waterOn && <canvas ref={waterRef} width={W} height={H} style={{ ...fill, transform: `scale(${scale})` }} />}
+      {waterOn && <canvas key={fallbackKey} ref={waterRef} width={W} height={H} style={{ ...fill, transform: `scale(${scale})` }} />}
       {breathe !== 0 && <AbsoluteFill style={{ backgroundColor: breathe > 0 ? "white" : "black", opacity: Math.abs(breathe) }} />}
       {o.fog && <canvas ref={fogRef} width={FW} height={FH} style={{ ...fill, mixBlendMode: "screen" }} />}
       <canvas ref={lightRef} width={W} height={H} style={{ ...fill, mixBlendMode: "screen" }} />

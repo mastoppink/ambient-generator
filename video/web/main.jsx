@@ -35,7 +35,7 @@ function initialConfig() {
     loopSeconds: Math.max(10, Math.round(c.loopSeconds / 2) * 2),
     intro: { enabled: true, seconds: 10, reveal: "horizon", layout: "center", tone: "ivory", title: t || "Ambient", subtitle: rest.join(" · "), channel: "The Quiet Ruins", ...c.intro },
     fontPair: c.fontPair || "classic",
-    water: { enabled: false, mask: null, ripple: 0.5, drops: 0.4, shimmer: 0.4, ...c.water },
+    water: { enabled: false, mask: null, ripple: 0.7, drops: 0.5, shimmer: 0.5, ...c.water },
     cta: { enabled: true, style: "caption", text: "For more quiet places,", button: "Subscribe", start: 2, hold: 8, firstMin: 1, everyMin: 20, ...c.cta },
   };
 }
