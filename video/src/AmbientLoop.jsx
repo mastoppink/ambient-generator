@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AbsoluteFill, Img, staticFile, useCurrentFrame, useVideoConfig, random, delayRender, continueRender } from "remotion";
+import { createWater } from "./waterGL.js";
 
 /*
  * Every motion here is periodic over the composition length, so the rendered clip
@@ -50,9 +51,13 @@ export const Scene = ({ image, overlays: o, renderScale = 1, phase, grainFrame =
   const imgEl = useImageElement(waterOn ? src : null);
   const maskEl = useImageElement(waterOn ? water.mask : null);
 
+  const glRef = useRef(null);
   useLayoutEffect(() => {
     const c = waterRef.current; if (!c || !waterOn || !imgEl || !maskEl) return;
-    drawWater(c.getContext("2d"), p, W, H, imgEl, maskEl, water);
+    if (!glRef.current || glRef.current.canvas !== c) glRef.current = { canvas: c, water: createWater(c) };
+    const gw = glRef.current.water;
+    if (gw) gw.draw({ img: imgEl, mask: featheredMask(maskEl, 960, 540), p, w: water, drops: waterDrops(p, water) });
+    else drawWater(c.getContext("2d"), p, W, H, imgEl, maskEl, water); // fallback without WebGL
   }, [p, W, H, imgEl, maskEl, waterOn, water]);
   const FW = Math.round(W / 2), FH = Math.round(H / 2); // fog is soft: half resolution is invisible and 4× cheaper
 
@@ -275,7 +280,20 @@ function grainTexture(n) {
   });
 }
 
-/* ---------- Living water: rippling reflection, drop rings and glints, only inside the painted mask ---------- */
+/** Drop rings for the shader: [x, y, t, size], integer cycles per loop. */
+function waterDrops(p, w) {
+  const n = Math.round((w.drops ?? 0.4) * 16), out = [];
+  for (let i = 0; i < n; i++) {
+    const q = (k) => random(`drop${k}${i}`);
+    const cycles = 1 + Math.floor(q("c") * 2);
+    const t = (((p * cycles + q("p")) % 1) + 1) % 1;
+    if (t > 0.7) continue;
+    out.push([q("x"), 0.35 + q("y") * 0.65, t / 0.7, 0.6 + q("s") * 0.8]);
+  }
+  return out;
+}
+
+/* ---------- (fallback) Living water: rippling reflection, drop rings and glints, only inside the painted mask ---------- */
 const featherCache = new WeakMap();
 function featheredMask(mask, W, H) {
   let byKey = featherCache.get(mask);
