@@ -113,6 +113,7 @@ function App() {
   async function render() {
     if (!imageUrl || !audio) return;
     const ctrl = new AbortController(); abortRef.current = ctrl;
+    let step = "menyiapkan render", writable = null, fileHandle = null;
     try {
       // Choose an MP4-compatible codec the browser can encode.
       const codecs = await getEncodableVideoCodecs("mp4");
@@ -128,16 +129,24 @@ function App() {
       if (!check.canRender) throw new Error(check.issues.map((i) => i.message).join("\n"));
 
       // Ask for the output file first (needs a user gesture) so long videos stream to disk.
-      let writable = null, fileHandle = null;
+      step = "membuka file tujuan";
       if (window.showSaveFilePicker) {
         const name = (audio.name.replace(/\.[^.]+$/, "") || "ambient") + ".mp4";
         fileHandle = await window.showSaveFilePicker({ suggestedName: name, types: [{ description: "MP4", accept: { "video/mp4": [".mp4"] } }] });
         writable = await fileHandle.createWritable();
       }
 
+      // Read the source files into memory now: files on cloud-synced folders (Drive, OneDrive, iCloud),
+      // network drives or USB sticks can fail mid-way with "network error" when read lazily.
+      step = "membaca file audio";
       setStatus({ stage: "render", progress: 0 });
+      const audioData = audio.size < 1.5e9 ? new File([await audio.arrayBuffer()], audio.name, { type: audio.type }) : audio;
+      step = "membaca file gambar";
+      const imageData = gradedBlobRef.current || new Blob([await imageFile.arrayBuffer()], { type: imageFile.type });
+
+      step = "render loop";
       // A dedicated URL that stays valid for the whole render, whatever happens to the preview.
-      const renderImageUrl = URL.createObjectURL(gradedBlobRef.current || imageFile);
+      const renderImageUrl = URL.createObjectURL(imageData);
       const renderProps = { ...inputProps, image: renderImageUrl, renderScale: scale };
       const { getBlob } = await renderMediaOnWeb({
         composition, inputProps: renderProps, container: "mp4", videoCodec, muted: true, scale,
@@ -148,8 +157,9 @@ function App() {
       const loopBlob = await getBlob();
       URL.revokeObjectURL(renderImageUrl);
 
+      step = "menggabungkan video dengan audio";
       setStatus({ stage: "mux", progress: 0 });
-      const blob = await muxLoopWithAudio(loopBlob, audio, {
+      const blob = await muxLoopWithAudio(loopBlob, audioData, {
         writable, signal: ctrl.signal, onProgress: (p) => setStatus({ stage: "mux", progress: p }),
       });
       if (blob) {
@@ -159,8 +169,17 @@ function App() {
       }
       setStatus({ stage: "done", name: fileHandle?.name });
     } catch (e) {
+      try { await writable?.abort(); } catch {}
       if (e?.name === "AbortError") setStatus({ stage: "idle" });
-      else { console.error(e); setStatus({ stage: "error", message: e?.message || String(e) }); }
+      else {
+        console.error(e);
+        const raw = e?.message || String(e);
+        const fileIssue = /network error|NotReadable|could not be read|NotFound/i.test(raw + " " + (e?.name || ""));
+        const hint = fileIssue
+          ? "\nFile tidak bisa dibaca oleh browser. Salin gambar dan audio ke folder lokal (mis. Desktop, bukan Google Drive/OneDrive/iCloud, drive jaringan atau flashdisk), pilih ulang file-nya, lalu render lagi."
+          : "";
+        setStatus({ stage: "error", message: `Gagal saat ${step}: ${raw}${hint}` });
+      }
     } finally { abortRef.current = null; }
   }
 
