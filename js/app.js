@@ -1,8 +1,8 @@
-import { LANDSCAPES, MOODS, ASPECTS } from "./data.js?v=5";
+import { LANDSCAPES, MOODS, ASPECTS } from "./data.js?v=6";
 import {
   ALL_FIELDS, SINGLE, optionsFor, getLandscape, defaultSelection, buildPrompt, randomState, serialize, parse,
-} from "./generator.js?v=5";
-import { stateFromTitle } from "./title.js?v=5";
+} from "./generator.js?v=6";
+import { stateFromTitle } from "./title.js?v=6";
 
 const $ = (s) => document.querySelector(s);
 const FIELD_LABELS = {
@@ -138,7 +138,9 @@ function generateFromTitle() {
   const tag = (label, ok, why) => `<b>${esc(label)}</b>${ok ? "" : ` <i>(${why})</i>`}`;
   $("#title-detected").innerHTML =
     `Landscape: ${tag(detected.landscape, detected.landscapeMatched, "acak, tidak ada kata kunci")} · Nuansa: ${tag(detected.mood, detected.moodMatched, "default")}` +
-    (detected.extras ? ` · ${detected.extras} kalimat suasana ditambahkan` : "");
+    ` · Cahaya: <b>${detected.tone}</b>` +
+    (detected.extras ? ` · ${detected.extras} kalimat suasana` : "") +
+    (detected.groups.length ? `<br>Terdeteksi: ${detected.groups.join(", ")}` : "");
 }
 $("#title-generate").addEventListener("click", generateFromTitle);
 $("#title-input").addEventListener("keydown", (e) => { if (e.key === "Enter") generateFromTitle(); });

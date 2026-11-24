@@ -7,7 +7,7 @@ Web statis untuk merakit prompt gambar bertema **kenopsia, megalophobia, liminal
 - Dioptimalkan untuk latar musik ambient: subjek kecil dan jauh, ruang kosong dominan, cahaya redup, kontras rendah
 - 6 landscape dengan thumbnail dan 4 nuansa: Ambient Solitude (default), Kenopsia, Megalophobia, Liminal Space
 - Pilih detail (structure, decay, atmosphere, lighting, distance, emptiness) atau tulis nilai custom sendiri
-- **Auto dari judul audio**: ketik judul (Inggris/Indonesia), generator mendeteksi kata kunci untuk memilih landscape, nuansa, detail dan kalimat suasana (malam, senja, hujan, salju, bulan…). Judul yang sama selalu memberi hasil yang sama. Kamus kata kunci ada di `js/title.js`
+- **Auto dari judul audio**: ketik judul (Inggris/Indonesia), generator mendeteksi kata kunci untuk memilih landscape, nuansa, detail dan kalimat suasana. Memahami bank kata judul ambient: mode/suasana (Lydian–Phrygian), kecerahan, citra luar angkasa (jadi langit), melodi, tujuan, bentuk lagu, nama chapter; kata terlarang (432, Hz, binaural, healing, …) diabaikan. Judul yang sama selalu memberi hasil yang sama. Aturannya ada di `RULES` dalam `js/title.js`
 - Toggle "Ruang untuk judul", kalimat tambahan bebas
 - Tombol acak, salin, link share (state tersimpan di URL) dan riwayat (localStorage)
 
