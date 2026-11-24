@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Player } from "@remotion/player";
 import { renderMediaOnWeb, canRenderMediaOnWeb, getEncodableVideoCodecs } from "@remotion/web-renderer";
-import { AmbientLoop } from "../src/AmbientLoop.jsx";
+import { AmbientFull, segmentFrames } from "../src/Full.jsx";
 import { defaultProps } from "../src/Root.jsx";
 import { muxLoopWithAudio, audioDuration } from "./mux.js";
 import { PRESETS, DEFAULT_GRADE, presetFor, applyGrade } from "./grade.js";
@@ -21,11 +21,19 @@ const KINDS = ["snow", "rain", "dust", "sediment", "stardust", "sparkle"];
 
 /** Config can arrive from the prompt generator via ?cfg=<base64 json>. */
 function initialConfig() {
+  let c = defaultProps;
   try {
     const raw = new URLSearchParams(location.search).get("cfg");
-    if (raw) return { ...defaultProps, ...JSON.parse(decodeURIComponent(escape(atob(raw)))) };
+    if (raw) c = { ...defaultProps, ...JSON.parse(decodeURIComponent(escape(atob(raw)))) };
   } catch {}
-  return defaultProps;
+  // Intro text from the audio title: "Aurora · Weightless Ambient for Sleep" → title "Aurora", subtitle the rest.
+  const [t, ...rest] = (c.title || "").split(/\s*[·|—–-]\s+/);
+  return {
+    ...c,
+    loopSeconds: Math.max(10, Math.round(c.loopSeconds / 2) * 2),
+    intro: { enabled: true, seconds: 8, title: t || "Ambient", subtitle: rest.join(" · "), channel: "", ...c.intro },
+    cta: { enabled: true, text: "If this stillness keeps you company,", button: "Subscribe for more", start: 2, hold: 8, firstMin: 1, everyMin: 10, ...c.cta },
+  };
 }
 
 const fmtTime = (s) => {
@@ -52,7 +60,14 @@ function App() {
   const o = cfg.overlays;
   const setO = (patch) => setCfg((c) => ({ ...c, overlays: { ...c.overlays, ...patch } }));
   const inputProps = useMemo(() => ({ ...cfg, image: imageUrl || "" }), [cfg, imageUrl]);
-  const durationInFrames = Math.round(cfg.loopSeconds * cfg.fps);
+  const seg = segmentFrames(cfg);
+  const durationInFrames = seg.total;
+  const [previewPart, setPreviewPart] = useState("loop");
+  const setIntro = (patch) => setCfg((c) => ({ ...c, intro: { ...c.intro, ...patch } }));
+  const setCta = (patch) => setCfg((c) => ({ ...c, cta: { ...c.cta, ...patch } }));
+  const range = previewPart === "intro" && seg.I ? [0, seg.I - 1]
+    : previewPart === "cta" && seg.C ? [seg.I + seg.L, seg.total - 1]
+    : [seg.I, seg.I + seg.L - 1];
 
 
   const [preset, setPreset] = useState(() => presetFor(initialConfig().landscape));
@@ -121,7 +136,7 @@ function App() {
       if (!videoCodec) throw new Error("Browser ini tidak bisa meng-encode video. Pakai Chrome atau Edge versi terbaru di desktop.");
 
       const composition = {
-        id: "AmbientLoop", component: AmbientLoop, durationInFrames,
+        id: "AmbientFull", component: AmbientFull, durationInFrames,
         fps: cfg.fps, width: cfg.width, height: cfg.height,
       };
       const scale = RESOLUTIONS[resolution].scale;
@@ -150,7 +165,7 @@ function App() {
       const renderProps = { ...inputProps, image: renderImageUrl, renderScale: scale };
       const { getBlob } = await renderMediaOnWeb({
         composition, inputProps: renderProps, container: "mp4", videoCodec, muted: true, scale,
-        videoBitrate: QUALITIES[quality].bps[resolution], keyframeIntervalInSeconds: 4,
+        videoBitrate: QUALITIES[quality].bps[resolution], keyframeIntervalInSeconds: 2,
         licenseKey: "free-license", signal: ctrl.signal,
         onProgress: (p) => setStatus({ stage: "render", progress: p.progress }),
       });
@@ -160,6 +175,10 @@ function App() {
       step = "menggabungkan video dengan audio";
       setStatus({ stage: "mux", progress: 0 });
       const blob = await muxLoopWithAudio(loopBlob, audioData, {
+        segments: {
+          intro: seg.I / cfg.fps, loop: seg.L / cfg.fps,
+          cta: seg.C ? { first: cfg.cta.firstMin * 60, every: Math.max(1, cfg.cta.everyMin) * 60 } : undefined,
+        },
         writable, signal: ctrl.signal, onProgress: (p) => setStatus({ stage: "mux", progress: p }),
       });
       if (blob) {
@@ -251,7 +270,30 @@ function App() {
           </div>
         </details>
 
-        <h2><span className="num">03</span> Overlay</h2>
+        <h2><span className="num">03</span> Intro &amp; CTA</h2>
+        <label className="toggle"><input type="checkbox" checked={cfg.intro.enabled} onChange={(e) => setIntro({ enabled: e.target.checked })} /> Intro (judul di awal video)</label>
+        {cfg.intro.enabled && (
+          <div className="grid2" style={{ margin: "10px 0 16px" }}>
+            <label className="row"><span>Judul</span><input className="custom" value={cfg.intro.title} onChange={(e) => setIntro({ title: e.target.value })} /></label>
+            <label className="row"><span>Subjudul</span><input className="custom" value={cfg.intro.subtitle} onChange={(e) => setIntro({ subtitle: e.target.value })} /></label>
+            <label className="row"><span>Nama channel (opsional)</span><input className="custom" value={cfg.intro.channel} onChange={(e) => setIntro({ channel: e.target.value })} /></label>
+            <label className="row"><span>Durasi intro</span>
+              <select value={cfg.intro.seconds} onChange={(e) => setIntro({ seconds: +e.target.value })}>
+                {[6, 8, 10, 12].map((s) => <option key={s} value={s}>{s} detik</option>)}
+              </select></label>
+          </div>
+        )}
+        <label className="toggle"><input type="checkbox" checked={cfg.cta.enabled} onChange={(e) => setCta({ enabled: e.target.checked })} /> CTA Subscribe (muncul berkala)</label>
+        {cfg.cta.enabled && (
+          <div className="grid2" style={{ margin: "10px 0 16px" }}>
+            <label className="row"><span>Teks ajakan</span><input className="custom" value={cfg.cta.text} onChange={(e) => setCta({ text: e.target.value })} /></label>
+            <label className="row"><span>Tombol</span><input className="custom" value={cfg.cta.button} onChange={(e) => setCta({ button: e.target.value })} /></label>
+            <label className="row"><span>Pertama muncul (menit ke-)</span><input className="custom" type="number" min="0" step="0.5" value={cfg.cta.firstMin} onChange={(e) => setCta({ firstMin: Math.max(0, +e.target.value) })} /></label>
+            <label className="row"><span>Ulangi setiap (menit)</span><input className="custom" type="number" min="1" step="1" value={cfg.cta.everyMin} onChange={(e) => setCta({ everyMin: Math.max(1, +e.target.value) })} /></label>
+          </div>
+        )}
+
+        <h2><span className="num">04</span> Overlay</h2>
         <div className="grid2">
           <Range label="Kabut" v={o.fog?.opacity ?? 0} max={0.6} onChange={(v) => setO({ fog: { ...o.fog, opacity: v } })} />
           <label className="row"><span>Warna kabut</span><input type="color" value={o.fog?.color || "#ffffff"} onChange={(e) => setO({ fog: { ...o.fog, color: e.target.value } })} /></label>
@@ -278,14 +320,20 @@ function App() {
           <select value={quality} onChange={(e) => setQuality(e.target.value)}>
             {Object.entries(QUALITIES).map(([k, q]) => <option key={k} value={k}>{q.label} · {Math.round(q.bps[resolution] / 1e6)} Mbps</option>)}
           </select></label>
-        <Range label="Panjang loop (detik)" v={cfg.loopSeconds} min={10} max={60} step={5} fmt={(v) => v + " d"} onChange={(v) => setCfg((c) => ({ ...c, loopSeconds: v }))} />
+        <Range label="Panjang loop (detik)" v={cfg.loopSeconds} min={10} max={60} step={2} fmt={(v) => v + " d"} onChange={(v) => setCfg((c) => ({ ...c, loopSeconds: v }))} />
       </section>
 
       <section className="output">
         <div className="panel">
-          <div className="out-head"><span>Pratinjau loop</span><small>render {Math.round(cfg.width * RESOLUTIONS[resolution].scale)}×{Math.round(cfg.height * RESOLUTIONS[resolution].scale)} · loop {cfg.loopSeconds} d</small></div>
+          <div className="seg-tabs">
+            {[["loop", "Loop"], ["intro", "Intro"], ["cta", "CTA Subscribe"]].map(([k, l]) => (
+              <button key={k} type="button" className={previewPart === k ? "active" : ""} disabled={(k === "intro" && !seg.I) || (k === "cta" && !seg.C)} onClick={() => setPreviewPart(k)}>{l}</button>
+            ))}
+          </div>
+          <div className="out-head"><span>Pratinjau</span><small>render {Math.round(cfg.width * RESOLUTIONS[resolution].scale)}×{Math.round(cfg.height * RESOLUTIONS[resolution].scale)} · loop {cfg.loopSeconds} d</small></div>
           {imageUrl ? (
-            <Player component={AmbientLoop} inputProps={inputProps} durationInFrames={durationInFrames}
+            <Player key={previewPart + range.join("-")} component={AmbientFull} inputProps={inputProps} durationInFrames={durationInFrames}
+              inFrame={range[0]} outFrame={range[1]}
               fps={cfg.fps} compositionWidth={cfg.width} compositionHeight={cfg.height}
               style={{ width: "100%", borderRadius: 8, overflow: "hidden" }} autoPlay loop controls />
           ) : <div className="placeholder">Pilih gambar latar untuk melihat pratinjau</div>}
@@ -303,7 +351,7 @@ function App() {
           {status.stage === "done" && <p className="ok">✔ Selesai{status.name ? `: ${status.name} tersimpan` : ", file terunduh"}.</p>}
           {status.stage === "error" && <p className="err">✖ {status.message}</p>}
           <p className="hint">
-            Hanya loop {cfg.loopSeconds} detik yang dirender, lalu diulang sepanjang audio tanpa render ulang.
+            Yang dirender hanya {[seg.I && "intro", "1 loop", seg.C && "1 loop CTA"].filter(Boolean).join(" + ")} ({Math.round(seg.total / cfg.fps)} detik), lalu loop diulang sepanjang audio tanpa render ulang.
             Untuk 4K, upscale gambar dulu agar detailnya tajam. Semua proses berjalan di browser Anda, tidak ada file yang diunggah. Butuh Chrome atau Edge versi terbaru di desktop.
           </p>
         </div>

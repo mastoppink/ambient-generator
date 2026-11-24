@@ -30,10 +30,13 @@ async function pickAacBitrate(track) {
  *
  * @param {Blob} loopBlob  rendered loop (mp4)
  * @param {File} audioFile
- * @param {{ writable?: WritableStream, onProgress?: (p:number)=>void, signal?: AbortSignal }} opts
+ * @param {{ writable?: WritableStream, onProgress?: (p:number)=>void, signal?: AbortSignal,
+ *   segments?: { intro: number, loop: number, cta?: { first: number, every: number } } }} opts
+ *   When `segments` is given, the rendered clip holds [intro][loop][ctaLoop] (seconds); the output plays
+ *   intro once, then the loop, swapping in the CTA loop at `first` seconds and then every `every` seconds.
  * @returns {Promise<Blob|null>} Blob when no writable was given (in-memory), else null
  */
-export async function muxLoopWithAudio(loopBlob, audioFile, { writable, onProgress, signal } = {}) {
+export async function muxLoopWithAudio(loopBlob, audioFile, { writable, onProgress, signal, segments } = {}) {
   const vIn = new Input({ source: new BlobSource(loopBlob), formats: ALL_FORMATS });
   const aIn = new Input({ source: new BlobSource(audioFile), formats: ALL_FORMATS });
   const vTrack = await vIn.getPrimaryVideoTrack();
@@ -44,9 +47,33 @@ export async function muxLoopWithAudio(loopBlob, audioFile, { writable, onProgre
   const loopDur = await vTrack.computeDuration();
   const total = await aTrack.computeDuration();
 
-  // Load loop packets once (a 30 s loop is small).
+  // Load loop packets once (a short loop is small).
   const vPackets = [];
   for await (const pkt of new EncodedPacketSink(vTrack).packets()) vPackets.push(pkt);
+
+  // Split into segments; each must start with a key packet so it can be joined without re-encoding.
+  const seg = segments || { intro: 0, loop: loopDur };
+  const eps = 0.5 / (vTrack.frameRate || 30);
+  const cut = (from, len) => {
+    const list = vPackets.filter((p) => p.timestamp >= from - eps && p.timestamp < from + len - eps)
+      .map((p) => p.clone({ timestamp: p.timestamp - from }));
+    if (list.length && list[0].type !== "key") throw new Error("Potongan video tidak diawali keyframe; coba panjang loop/intro kelipatan 2 detik.");
+    return list;
+  };
+  const introP = seg.intro ? cut(0, seg.intro) : [];
+  const loopP = cut(seg.intro, seg.loop);
+  const ctaP = seg.cta ? cut(seg.intro + seg.loop, seg.loop) : null;
+  // Playlist of [packets, duration] played back to back.
+  let nextCta = seg.cta ? seg.cta.first : Infinity;
+  const pieces = (function* () {
+    let t = 0;
+    if (introP.length) { yield [introP, seg.intro]; t += seg.intro; }
+    while (true) {
+      if (ctaP && t + 1e-6 >= nextCta) { nextCta += seg.cta.every; yield [ctaP, seg.loop]; }
+      else yield [loopP, seg.loop];
+      t += seg.loop;
+    }
+  })();
   const vConfig = await vTrack.getDecoderConfig();
 
   const format = new Mp4OutputFormat({ fastStart: writable ? false : "in-memory" });
@@ -67,19 +94,18 @@ export async function muxLoopWithAudio(loopBlob, audioFile, { writable, onProgre
   await out.start();
 
   // Interleave: write video up to the current audio time, then the next chunk of audio.
-  let rep = 0, vi = 0, firstV = true;
+  let base = 0, cur = pieces.next().value, vi = 0, firstV = true;
   const writeVideoUntil = async (t) => {
     while (true) {
-      const base = rep * loopDur;
       if (base >= total) return;
-      const pkt = vPackets[vi];
+      const pkt = cur[0][vi];
       const ts = base + pkt.timestamp;
       if (ts > t) return;
       if (ts < total) {
         await vSrc.add(pkt.clone({ timestamp: ts }), firstV ? { decoderConfig: vConfig } : undefined);
         firstV = false;
       }
-      if (++vi >= vPackets.length) { vi = 0; rep++; }
+      if (++vi >= cur[0].length) { vi = 0; base += cur[1]; cur = pieces.next().value; }
     }
   };
 

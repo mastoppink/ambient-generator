@@ -11,10 +11,17 @@ import { AbsoluteFill, Img, staticFile, useCurrentFrame, useVideoConfig, random 
  */
 const TAU = Math.PI * 2;
 
-export const AmbientLoop = ({ image, overlays: o, renderScale = 1 }) => {
+export const AmbientLoop = (props) => {
   const frame = useCurrentFrame();
-  const { durationInFrames, width, height } = useVideoConfig();
-  const p = frame / durationInFrames; // phase 0..1
+  const { durationInFrames } = useVideoConfig();
+  return <Scene {...props} phase={frame / durationInFrames} grainFrame={frame} />;
+};
+
+/** The ambient scene at a given loop phase (0..1). */
+export const Scene = ({ image, overlays: o, renderScale = 1, phase, grainFrame = 0 }) => {
+  const { width, height } = useVideoConfig();
+  const p = phase;
+  const frame = grainFrame;
 
   const wave = 0.5 - 0.5 * Math.cos(TAU * p); // 0 → 1 → 0
   const scale = 1 + (o.zoom || 0) * wave;

@@ -31,3 +31,9 @@
 .adv { margin: 4px 0 8px; font-size: .85rem; }
 .adv summary { cursor: pointer; color: var(--muted); margin-bottom: 10px; }
 .adv summary small { color: var(--accent); }
+.seg-tabs { display: flex; gap: 6px; margin-bottom: 10px; }
+.seg-tabs button { border: 1px solid var(--line); background: var(--panel-2); color: var(--muted); border-radius: 999px; padding: 5px 14px; font-size: .8rem; cursor: pointer; }
+.seg-tabs button.active { border-color: var(--accent); color: #e6f0f0; background: var(--accent-dim); }
+.seg-tabs button:disabled { opacity: .4; cursor: default; }
+.toggle { display: flex; align-items: center; gap: 8px; font-size: .88rem; margin: 6px 0; }
+.toggle input { accent-color: var(--accent); }
