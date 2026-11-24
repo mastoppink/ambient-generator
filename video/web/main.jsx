@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Player } from "@remotion/player";
 import { renderMediaOnWeb, canRenderMediaOnWeb, getEncodableVideoCodecs } from "@remotion/web-renderer";
-import { AmbientFull, segmentFrames, FONT_PAIRS, INTRO_STYLES } from "../src/Full.jsx";
+import { AmbientFull, segmentFrames, FONT_PAIRS, INTRO_STYLES, INTRO_LAYOUTS, TONES, CTA_STYLES } from "../src/Full.jsx";
 import { defaultProps } from "../src/Root.jsx";
 import { muxLoopWithAudio, audioDuration } from "./mux.js";
 import { PRESETS, DEFAULT_GRADE, presetFor, applyGrade } from "./grade.js";
@@ -31,9 +31,9 @@ function initialConfig() {
   return {
     ...c,
     loopSeconds: Math.max(10, Math.round(c.loopSeconds / 2) * 2),
-    intro: { enabled: true, seconds: 10, reveal: "horizon", title: t || "Ambient", subtitle: rest.join(" · "), channel: "The Quiet Ruins", ...c.intro },
+    intro: { enabled: true, seconds: 10, reveal: "horizon", layout: "center", tone: "ivory", title: t || "Ambient", subtitle: rest.join(" · "), channel: "The Quiet Ruins", ...c.intro },
     fontPair: c.fontPair || "classic",
-    cta: { enabled: true, text: "For more quiet places,", button: "Subscribe", start: 2, hold: 8, firstMin: 1, everyMin: 20, ...c.cta },
+    cta: { enabled: true, style: "caption", text: "For more quiet places,", button: "Subscribe", start: 2, hold: 8, firstMin: 1, everyMin: 20, ...c.cta },
   };
 }
 
@@ -277,6 +277,11 @@ function App() {
         </details>
 
         <h2><span className="num">03</span> Intro &amp; CTA</h2>
+        <button type="button" className="shuffle" onClick={() => {
+          const pick = (o) => { const k = Object.keys(o); return k[Math.floor(Math.random() * k.length)]; };
+          setCfg((c) => ({ ...c, fontPair: pick(FONT_PAIRS), intro: { ...c.intro, reveal: pick(INTRO_STYLES), layout: pick(INTRO_LAYOUTS), tone: pick(TONES) }, cta: { ...c.cta, style: pick(CTA_STYLES) } }));
+          setPreviewPart("intro");
+        }}>🎲 Acak gaya intro &amp; CTA</button>
         <label className="row" style={{ marginBottom: 10 }}><span>Tipografi</span>
           <select value={cfg.fontPair} onChange={(e) => setCfg((c) => ({ ...c, fontPair: e.target.value }))}>
             {Object.entries(FONT_PAIRS).map(([k, f]) => <option key={k} value={k}>{f.label}</option>)}
@@ -291,6 +296,14 @@ function App() {
               <select value={cfg.intro.reveal} onChange={(e) => setIntro({ reveal: e.target.value })}>
                 {Object.entries(INTRO_STYLES).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
               </select></label>
+            <label className="row"><span>Tata letak</span>
+              <select value={cfg.intro.layout} onChange={(e) => setIntro({ layout: e.target.value })}>
+                {Object.entries(INTRO_LAYOUTS).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
+              </select></label>
+            <label className="row"><span>Warna teks</span>
+              <select value={cfg.intro.tone} onChange={(e) => setIntro({ tone: e.target.value })}>
+                {Object.entries(TONES).map(([k, t]) => <option key={k} value={k}>{t.label}</option>)}
+              </select></label>
             <label className="row"><span>Durasi intro</span>
               <select value={cfg.intro.seconds} onChange={(e) => setIntro({ seconds: +e.target.value })}>
                 {[6, 8, 10, 12].map((s) => <option key={s} value={s}>{s} detik</option>)}
@@ -300,6 +313,10 @@ function App() {
         <label className="toggle"><input type="checkbox" checked={cfg.cta.enabled} onChange={(e) => setCta({ enabled: e.target.checked })} /> CTA Subscribe (muncul berkala)</label>
         {cfg.cta.enabled && (
           <div className="grid2" style={{ margin: "10px 0 16px" }}>
+            <label className="row"><span>Gaya CTA</span>
+              <select value={cfg.cta.style} onChange={(e) => setCta({ style: e.target.value })}>
+                {Object.entries(CTA_STYLES).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
+              </select></label>
             <label className="row"><span>Teks ajakan</span><input className="custom" value={cfg.cta.text} onChange={(e) => setCta({ text: e.target.value })} /></label>
             <label className="row"><span>Tombol</span><input className="custom" value={cfg.cta.button} onChange={(e) => setCta({ button: e.target.value })} /></label>
             <label className="row"><span>Pertama muncul (menit ke-)</span><input className="custom" type="number" min="0" step="0.5" value={cfg.cta.firstMin} onChange={(e) => setCta({ firstMin: Math.max(0, +e.target.value) })} /></label>

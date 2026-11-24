@@ -37,3 +37,4 @@
 .seg-tabs button:disabled { opacity: .4; cursor: default; }
 .toggle { display: flex; align-items: center; gap: 8px; font-size: .88rem; margin: 6px 0; }
 .toggle input { accent-color: var(--accent); }
+.shuffle { border: 1px solid var(--accent); background: transparent; color: var(--accent); border-radius: 8px; padding: 7px 14px; cursor: pointer; font-size: .85rem; margin-bottom: 12px; }
