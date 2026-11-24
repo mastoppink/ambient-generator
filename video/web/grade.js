@@ -24,7 +24,7 @@ export const presetFor = (landscape) => ({
 const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255);
 const clamp = (x) => (x < 0 ? 0 : x > 1 ? 1 : x);
 
-/** Returns a PNG blob of `source` with the grade applied. */
+/** Returns a high-quality JPEG blob of `source` with the grade applied (small and fast to decode while rendering). */
 export async function applyGrade(source, grade) {
   const g = { ...DEFAULT_GRADE, ...grade };
   const bmp = await createImageBitmap(source);
@@ -57,5 +57,5 @@ export async function applyGrade(source, grade) {
     }
     ctx.putImageData(img, 0, 0);
   }
-  return canvas.convertToBlob({ type: "image/png" });
+  return canvas.convertToBlob({ type: "image/jpeg", quality: 0.95 });
 }

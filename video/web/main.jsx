@@ -49,6 +49,7 @@ function App() {
   const [preset, setPreset] = useState(() => presetFor(initialConfig().landscape));
   const [grade, setGrade] = useState(() => ({ ...DEFAULT_GRADE, ...PRESETS[presetFor(initialConfig().landscape)] }));
   const [grading, setGrading] = useState(false);
+  const gradedBlobRef = useRef(null);
   const setG = (patch) => { setPreset("custom"); setGrade((g) => ({ ...g, ...patch })); };
   const choosePreset = (k) => { setPreset(k); setGrade((g) => ({ ...DEFAULT_GRADE, ...PRESETS[k], intensity: g.intensity })); };
 
@@ -60,7 +61,10 @@ function App() {
     const t = setTimeout(async () => {
       try {
         const blob = await applyGrade(imageFile, grade);
-        if (!cancelled) setImageUrl((old) => { if (old) URL.revokeObjectURL(old); return URL.createObjectURL(blob); });
+        if (cancelled) return;
+        gradedBlobRef.current = blob;
+        // Revoke the previous preview URL later, never while something may still be loading it.
+        setImageUrl((old) => { if (old) setTimeout(() => URL.revokeObjectURL(old), 30000); return URL.createObjectURL(blob); });
       } finally { if (!cancelled) setGrading(false); }
     }, 250);
     return () => { cancelled = true; clearTimeout(t); };
@@ -123,13 +127,17 @@ function App() {
       }
 
       setStatus({ stage: "render", progress: 0 });
+      // A dedicated URL that stays valid for the whole render, whatever happens to the preview.
+      const renderImageUrl = URL.createObjectURL(gradedBlobRef.current || imageFile);
+      const renderProps = { ...inputProps, image: renderImageUrl };
       const { getBlob } = await renderMediaOnWeb({
-        composition, inputProps, container: "mp4", videoCodec, muted: true, scale,
+        composition, inputProps: renderProps, container: "mp4", videoCodec, muted: true, scale,
         videoBitrate: "very-high", keyframeIntervalInSeconds: 2,
         licenseKey: "free-license", signal: ctrl.signal,
         onProgress: (p) => setStatus({ stage: "render", progress: p.progress }),
       });
       const loopBlob = await getBlob();
+      URL.revokeObjectURL(renderImageUrl);
 
       setStatus({ stage: "mux", progress: 0 });
       const blob = await muxLoopWithAudio(loopBlob, audio, {
@@ -172,7 +180,7 @@ function App() {
               : <div className="progress"><div className="bar"><div style={{ width: Math.round(up.progress * 100) + "%" }} /></div>
                   <small>Upscale {Math.round(up.progress * 100)}% · {up.backend === "webgpu" ? "GPU (WebGPU)" : up.backend ? "CPU (lambat, " + (upModel === "max" ? "bisa >10 menit" : "1–2 menit") + ")" : upModel === "max" ? "mengunduh model 67 MB…" : "memuat model…"}</small></div>}
             {up.stage === "done" && <p className="ok" style={{ margin: 0 }}>✔ Gambar 4K dipakai untuk video</p>}
-            {imageUrl && <a className="dl" href={imageUrl} download={(imageName || "background").replace(/\.[^.]+$/, "") + "-graded.png"}>Unduh gambar (dengan grading)</a>}
+            {imageUrl && <a className="dl" href={imageUrl} download={(imageName || "background").replace(/\.[^.]+$/, "") + "-graded.jpg"}>Unduh gambar (dengan grading)</a>}
             {up.stage === "error" && <p className="err">✖ {up.message}</p>}
           </div>
         )}
