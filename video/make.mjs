@@ -27,7 +27,7 @@ const config = configPath ? JSON.parse(fs.readFileSync(configPath, "utf8")) : {}
 const ext = path.extname(image).toLowerCase();
 fs.mkdirSync(path.join(dir, "public"), { recursive: true });
 fs.copyFileSync(image, path.join(dir, "public", "background" + ext));
-const props = { ...config, image: "background" + ext };
+const props = { ...config, image: "background" + ext, renderScale: config.scale ?? 2 };
 if (!props.overlays) die("Config tidak punya 'overlays'. Unduh 'video-config.json' dari web generator.");
 
 const outDir = path.join(dir, "out");

@@ -129,7 +129,7 @@ function App() {
       setStatus({ stage: "render", progress: 0 });
       // A dedicated URL that stays valid for the whole render, whatever happens to the preview.
       const renderImageUrl = URL.createObjectURL(gradedBlobRef.current || imageFile);
-      const renderProps = { ...inputProps, image: renderImageUrl };
+      const renderProps = { ...inputProps, image: renderImageUrl, renderScale: scale };
       const { getBlob } = await renderMediaOnWeb({
         composition, inputProps: renderProps, container: "mp4", videoCodec, muted: true, scale,
         videoBitrate: "very-high", keyframeIntervalInSeconds: 2,

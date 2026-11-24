@@ -1,4 +1,4 @@
-import { getLandscape } from "./generator.js?v=16";
+import { getLandscape } from "./generator.js?v=17";
 
 /*
  * Overlay & motion plan per landscape, adjusted by the prompt's extra sentences
@@ -91,7 +91,7 @@ export function videoConfig(state, plan) {
     height: state.aspect === "9:16" ? 1920 : 1080,
     fps: 30,
     scale: 2,
-    loopSeconds: 30,
+    loopSeconds: 20,
     landscape: state.landscape,
     overlays: plan,
   };
