@@ -1,9 +1,9 @@
-import { LANDSCAPES, MOODS, ASPECTS } from "./data.js?v=8";
+import { LANDSCAPES, MOODS, ASPECTS } from "./data.js?v=9";
 import {
   ALL_FIELDS, SINGLE, optionsFor, getLandscape, defaultSelection, buildPrompt, randomState, serialize, parse,
-} from "./generator.js?v=8";
-import { stateFromTitle } from "./title.js?v=8";
-import { overlayPlan, overlayNotes, overlayAssetPrompt, videoConfig } from "./overlays.js?v=8";
+} from "./generator.js?v=9";
+import { stateFromTitle } from "./title.js?v=9";
+import { overlayPlan, overlayNotes, overlayAssetPrompts, videoConfig } from "./overlays.js?v=9";
 
 const $ = (s) => document.querySelector(s);
 const FIELD_LABELS = {
@@ -68,7 +68,9 @@ function renderOutput() {
   $("#out-positive").value = positive;
   const plan = overlayPlan(state);
   $("#overlay-notes").innerHTML = overlayNotes(plan).map((n) => `<li>${esc(n)}</li>`).join("");
-  $("#overlay-prompt").value = overlayAssetPrompt(plan, state.aspect);
+  const assets = overlayAssetPrompts(plan, state.aspect);
+  $("#overlay-fog").value = assets.fog;
+  $("#overlay-particles").value = assets.particles;
   $("#char-count").textContent = `${positive.split(/\s+/).length} kata`;
   history.replaceState(null, "", "?" + serialize(state));
 }
@@ -126,7 +128,8 @@ $("#fields").addEventListener("input", (e) => {
 $("#aspect").addEventListener("change", (e) => { state.aspect = e.target.value; renderOutput(); });
 $("#style").addEventListener("change", (e) => { state.style = e.target.value; renderOutput(); });
 $("#copy-notes").addEventListener("click", (e) => copy(overlayNotes(overlayPlan(state)).map((n) => "- " + n).join("\n"), e.target));
-$("#copy-overlay").addEventListener("click", (e) => copy($("#overlay-prompt").value, e.target));
+$("#copy-overlay-fog").addEventListener("click", (e) => copy($("#overlay-fog").value, e.target));
+$("#copy-overlay-particles").addEventListener("click", (e) => copy($("#overlay-particles").value, e.target));
 $("#open-studio").addEventListener("click", () => {
   const cfg = videoConfig(state, overlayPlan(state));
   const enc = btoa(unescape(encodeURIComponent(JSON.stringify(cfg))));

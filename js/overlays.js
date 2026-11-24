@@ -1,4 +1,4 @@
-import { getLandscape } from "./generator.js?v=8";
+import { getLandscape } from "./generator.js?v=9";
 
 /*
  * Overlay & motion plan per landscape, adjusted by the prompt's extra sentences
@@ -62,8 +62,8 @@ export function overlayNotes(plan) {
 }
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
-/** Nano Banana prompt to create an overlay asset on pure black (for Screen blending). */
-export function overlayAssetPrompt(plan, aspect) {
+/** Nano Banana prompts (one image each) for overlay assets on pure black, for Screen blending. */
+export function overlayAssetPrompts(plan, aspect) {
   const subject = {
     sediment: "countless tiny soft particles of floating sea sediment, some slightly out of focus",
     dust: "fine floating dust particles caught in faint light, some blurred by depth of field",
@@ -72,13 +72,11 @@ export function overlayAssetPrompt(plan, aspect) {
     stardust: "sparse, tiny glittering specks of stardust, some softly glowing",
     sparkle: "a few tiny soft points of glinting light, like distant glass catching light",
   }[plan.particles.kind];
-  return [
-    `Two separate overlay textures for video compositing, each on a pure, completely black background (#000000).`,
-    `First: soft, wispy layers of drifting fog and smoke in light grey, thin and translucent, spread evenly across the frame with no hard edges.`,
-    `Second: ${subject}.`,
-    `Nothing else in the image: no landscape, no horizon, no objects, no text. Photographic, realistic, high resolution, ${aspect} format.`,
-    `Generate them as two separate images.`,
-  ].join(" ");
+  const tail = `Nothing else in the image: no landscape, no horizon, no objects, no text. The background must be pure, completely black (#000000). Photographic and realistic, high resolution, ${aspect} format. This is an overlay texture for video compositing with Screen blending.`;
+  return {
+    fog: `A single overlay texture of soft, wispy layers of drifting fog and smoke in light grey, thin and translucent, spread evenly across the frame with no hard edges. ${tail}`,
+    particles: `A single overlay texture of ${subject}, scattered evenly across the whole frame. ${tail}`,
+  };
 }
 
 /** JSON config consumed by the Remotion project in /video. */

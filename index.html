@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@400;500&family=JetBrains+Mono&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./css/style.css?v=8">
+  <link rel="stylesheet" href="./css/style.css?v=9">
 </head>
 <body>
   <header class="hero">
@@ -64,9 +64,12 @@
           <button id="open-studio" type="button" class="primary">Buka Video Studio →</button>
           <button id="download-config" type="button">Unduh Config Video</button></div>
         <p class="hint">Video Studio merender video MP4 panjang dari gambar + audio langsung di browser, memakai overlay di atas.</p>
-        <div class="out-head"><span>Prompt Aset Overlay</span><small>latar hitam, blend Screen</small></div>
-        <textarea id="overlay-prompt" readonly rows="5"></textarea>
-        <div class="actions"><button id="copy-overlay" type="button">Salin Prompt Overlay</button></div>
+        <div class="out-head"><span>Aset Overlay 1 · Kabut</span><small>untuk editor lain, blend Screen</small></div>
+        <textarea id="overlay-fog" readonly rows="4"></textarea>
+        <div class="actions"><button id="copy-overlay-fog" type="button">Salin Prompt Kabut</button></div>
+        <div class="out-head"><span>Aset Overlay 2 · Partikel</span></div>
+        <textarea id="overlay-particles" readonly rows="4"></textarea>
+        <div class="actions"><button id="copy-overlay-particles" type="button">Salin Prompt Partikel</button></div>
       </div>
 
       <div class="panel">
@@ -77,6 +80,6 @@
   </main>
 
   <footer>Static app · GitHub Pages</footer>
-  <script type="module" src="./js/app.js?v=8"></script>
+  <script type="module" src="./js/app.js?v=9"></script>
 </body>
 </html>
