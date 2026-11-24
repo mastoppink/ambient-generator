@@ -37,7 +37,9 @@ h2:first-child { margin-top: 0; }
 }
 .card:hover { border-color: #3a414b; }
 .card.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent) inset; }
-.card-swatch { display: block; height: 54px; background: linear-gradient(135deg, var(--c2), var(--c1) 55%, var(--c3)); opacity: .85; }
+.card-swatch { display: block; aspect-ratio: 16 / 9; background: linear-gradient(135deg, var(--c2), var(--c1) 55%, var(--c3)); overflow: hidden; }
+.card-swatch img { display: block; width: 100%; height: 100%; object-fit: cover; opacity: .82; transition: opacity .25s, transform .4s; }
+.card:hover .card-swatch img, .card.active .card-swatch img { opacity: 1; transform: scale(1.04); }
 .card-label { display: block; padding: 10px 12px; font-size: .85rem; }
 
 .moods { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }

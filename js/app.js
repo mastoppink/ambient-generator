@@ -23,7 +23,7 @@ function renderLandscapes() {
   $("#landscapes").innerHTML = LANDSCAPES.map((l) => `
     <button type="button" class="card ${l.id === state.landscape ? "active" : ""}" data-id="${l.id}"
       style="--c1:${l.swatch[0]};--c2:${l.swatch[1]};--c3:${l.swatch[2]}" aria-pressed="${l.id === state.landscape}">
-      <span class="card-swatch"></span><span class="card-label">${l.label}</span>
+      <span class="card-swatch"><img src="./assets/thumbs/${l.id}.svg" alt="" loading="lazy"></span><span class="card-label">${l.label}</span>
     </button>`).join("");
 }
 

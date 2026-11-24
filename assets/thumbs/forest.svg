@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180">
+<defs><linearGradient id="s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4c544f"/><stop offset="1" stop-color="#2c332c"/></linearGradient>
+<linearGradient id="m" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8b958c" stop-opacity="0"/><stop offset="1" stop-color="#8b958c" stop-opacity=".7"/></linearGradient></defs>
+<rect width="320" height="180" fill="url(#s)"/>
+<path fill="#20261f" d="M0 70h320v22H0zM20 92h22v88H20zm70 0h22v88H90zm70 0h22v88h-22zm70 0h22v88h-22zm70 0h22v88h-22zM42 92q24 50 48 0zm70 0q24 50 48 0zm70 0q24 50 48 0zm70 0q24 50 48 0z"/>
+<g fill="#4d5d40" opacity=".7"><rect y="70" width="320" height="4"/><path d="M60 74q4 20 2 30M150 74q-3 25 1 40M265 74q4 15 0 28" stroke="#4d5d40" stroke-width="2" fill="none"/></g>
+<rect y="90" width="320" height="90" fill="url(#m)"/>
+<g stroke="#1b201b" stroke-width="5" fill="none" stroke-linecap="round"><path d="M10 180V20M10 60l-12-14M10 90l14-18"/><path d="M300 180V10M300 50l14-16M300 80l-12-10"/><path d="M270 180V60M270 90l-10-12" stroke-width="3"/></g>
+<rect y="140" width="320" height="40" fill="#a3ada3" opacity=".35"/>
+</svg>
