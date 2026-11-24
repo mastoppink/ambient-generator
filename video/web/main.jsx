@@ -29,8 +29,10 @@ function App() {
   const [imageUrl, setImageUrl] = useState(null);
   const [imageName, setImageName] = useState("");
   const [imageFile, setImageFile] = useState(null);
+  const [origFile, setOrigFile] = useState(null);
   const [imageSize, setImageSize] = useState(null);
   const [up, setUp] = useState({ stage: "idle" });
+  const [upModel, setUpModel] = useState(() => ("gpu" in navigator ? "max" : "fast"));
   const [resolution, setResolution] = useState(() => (initialConfig().scale === 1 ? "1080" : "2160"));
   const [audio, setAudio] = useState(null);
   const [audioLen, setAudioLen] = useState(0);
@@ -48,16 +50,16 @@ function App() {
     setImageUrl(URL.createObjectURL(blob)); setImageName(name); setImageFile(blob);
     try { const b = await createImageBitmap(blob); setImageSize([b.width, b.height]); b.close(); } catch { setImageSize(null); }
   };
-  const onImage = (f) => { if (!f) return; setUp({ stage: "idle" }); useImage(f, f.name); };
+  const onImage = (f) => { if (!f) return; setUp({ stage: "idle" }); setOrigFile(f); useImage(f, f.name); };
 
   async function upscale() {
-    if (!imageFile) return;
+    if (!origFile) return;
     const target = { width: Math.round(cfg.width * 2), height: Math.round(cfg.height * 2) };
     setUp({ stage: "run", progress: 0 });
     try {
       const { upscaleImage } = await import("./upscale.js");
-      const r = await upscaleImage(imageFile, { ...target, onProgress: (p, backend) => setUp({ stage: "run", progress: p, backend }) });
-      const name = imageName.replace(/\.[^.]+$/, "") + "-4k.png";
+      const r = await upscaleImage(origFile, { ...target, model: upModel, onProgress: (p, backend) => setUp({ stage: "run", progress: p, backend }) });
+      const name = origFile.name.replace(/\.[^.]+$/, "") + "-4k.png";
       await useImage(r.blob, name);
       setUp({ stage: "done", url: URL.createObjectURL(r.blob), name, backend: r.backend });
     } catch (e) {
@@ -139,11 +141,17 @@ function App() {
         </label>
         {imageFile && (
           <div className="upscale">
+            {up.stage !== "run" && (
+              <select value={upModel} onChange={(e) => setUpModel(e.target.value)}>
+                <option value="max">Detail maksimal · Real-ESRGAN x4plus (67 MB, butuh GPU)</option>
+                <option value="fast">Cepat · Real-ESRGAN General x4v3 (5 MB)</option>
+              </select>
+            )}
             {up.stage !== "run"
-              ? <button type="button" onClick={upscale} disabled={up.stage === "done"}>{up.stage === "done" ? "✔ Sudah 4K" : "Upscale ke 4K (Real-ESRGAN)"}</button>
+              ? <button type="button" onClick={upscale}>{up.stage === "done" ? "Upscale ulang dari gambar asli" : "Upscale ke 4K (Real-ESRGAN)"}</button>
               : <div className="progress"><div className="bar"><div style={{ width: Math.round(up.progress * 100) + "%" }} /></div>
-                  <small>Upscale {Math.round(up.progress * 100)}% · {up.backend === "webgpu" ? "GPU (WebGPU)" : up.backend ? "CPU (lebih lambat)" : "memuat model…"}</small></div>}
-            {up.stage === "done" && <a className="dl" href={up.url} download={up.name}>Unduh gambar 4K</a>}
+                  <small>Upscale {Math.round(up.progress * 100)}% · {up.backend === "webgpu" ? "GPU (WebGPU)" : up.backend ? "CPU (lambat, " + (upModel === "max" ? "bisa >10 menit" : "1–2 menit") + ")" : upModel === "max" ? "mengunduh model 67 MB…" : "memuat model…"}</small></div>}
+            {up.stage === "done" && <p className="ok" style={{ margin: 0 }}>✔ Gambar 4K dipakai untuk video · <a className="dl" href={up.url} download={up.name}>Unduh gambar 4K</a></p>}
             {up.stage === "error" && <p className="err">✖ {up.message}</p>}
           </div>
         )}

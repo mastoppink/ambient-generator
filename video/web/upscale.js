@@ -1,20 +1,25 @@
 import * as ort from "onnxruntime-web/webgpu";
 
 /*
- * 4× super-resolution in the browser with Real-ESRGAN General x4v3 (BSD-3, xinntao/Real-ESRGAN),
- * converted to ONNX. Runs on WebGPU when available, otherwise on the CPU (WebAssembly).
+ * 4× super-resolution in the browser with Real-ESRGAN (BSD-3, xinntao/Real-ESRGAN), converted to ONNX:
+ * x4plus (RRDBNet, most detail) or General x4v3 blended with its weak-denoise variant (fast, keeps texture). Runs on WebGPU when available, otherwise on the CPU (WebAssembly).
  * The image is processed in overlapping tiles to keep GPU memory low, then resized to the target.
  */
 const BASE = new URL("./", import.meta.url);
 ort.env.wasm.wasmPaths = new URL("ort/", BASE).href;
 if (!self.crossOriginIsolated) ort.env.wasm.numThreads = 1;
-const MODEL_URL = new URL("../models/realesr-general-x4v3.onnx", BASE).href;
-const SCALE = 4, TILE = 192, PAD = 12;
+export const UPSCALE_MODELS = {
+  max: { label: "Detail maksimal · Real-ESRGAN x4plus (67 MB, butuh GPU)", file: "realesrgan-x4plus.onnx", tile: 128, pad: 10 },
+  fast: { label: "Cepat · Real-ESRGAN General x4v3 (5 MB)", file: "realesr-general-x4v3-dn03.onnx", tile: 192, pad: 12 },
+};
+export const defaultUpscaleModel = () => ("gpu" in navigator ? "max" : "fast");
+const SCALE = 4;
 
-let sessionPromise = null;
-async function getSession() {
-  if (!sessionPromise) {
-    sessionPromise = (async () => {
+const sessions = {};
+async function getSession(key) {
+  const MODEL_URL = new URL("../models/" + UPSCALE_MODELS[key].file, BASE).href;
+  if (!sessions[key]) {
+    sessions[key] = (async () => {
       const eps = "gpu" in navigator ? ["webgpu", "wasm"] : ["wasm"];
       for (const ep of eps) {
         try {
@@ -24,9 +29,9 @@ async function getSession() {
       }
       throw new Error("Model upscale tidak bisa dimuat di browser ini.");
     })();
-    sessionPromise.catch(() => { sessionPromise = null; });
+    sessions[key].catch(() => { delete sessions[key]; });
   }
-  return sessionPromise;
+  return sessions[key];
 }
 
 /**
@@ -34,14 +39,15 @@ async function getSession() {
  * @param {{ width:number, height:number, onProgress?:(p:number, info:string)=>void, signal?:AbortSignal }} opts
  * @returns {Promise<{ blob: Blob, width: number, height: number, backend: string }>}
  */
-export async function upscaleImage(file, { width, height, onProgress, signal }) {
+export async function upscaleImage(file, { width, height, model = "fast", onProgress, signal }) {
+  const { tile: TILE, pad: PAD } = UPSCALE_MODELS[model];
   const bmp = await createImageBitmap(file);
   const w = bmp.width, h = bmp.height;
   const src = new OffscreenCanvas(w, h).getContext("2d", { willReadFrequently: true });
   src.drawImage(bmp, 0, 0);
   const pixels = src.getImageData(0, 0, w, h).data;
 
-  const { session, backend } = await getSession();
+  const { session, backend } = await getSession(model);
   onProgress?.(0, backend);
 
   const W = w * SCALE, H = h * SCALE;
