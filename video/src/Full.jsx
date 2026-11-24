@@ -55,7 +55,7 @@ let SERIF = FONT_PAIRS.classic.serif + FALLBACK_SERIF, SERIF_W = 300, SIZE = 1;
 const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" };
 const ease = (t) => 1 - Math.pow(1 - t, 3);
 
-/** Letters fade in one by one (film title style); spaces keep their width. */
+/** (unused) Letters fade in one by one. */
 const Letters = ({ text, s, start, step, dur = 1.4, style }) => (
   <span style={style}>
     {[...text].map((ch, i) => {
@@ -66,39 +66,31 @@ const Letters = ({ text, s, start, step, dur = 1.4, style }) => (
 );
 
 /**
- * Title card: fade from black; "— CHANNEL —" with hairlines; title letters appear one by one while the
- * tracking slowly widens; hairline; italic subtitle; everything rises a little and dissolves into the loop.
+ * Title card, restrained European editorial style: small tracked capitals, generous space, slow staggered fades.
+ * Channel name → title (tracking widens almost imperceptibly) → hairline → italic subtitle; all dissolve together.
  */
 const Intro = ({ frame, total, fps, title = "", subtitle = "", channel = "" }) => {
   const s = frame / fps, end = total / fps;
-  const black = interpolate(s, [0, 2.4], [1, 0], clamp);
-  const out = interpolate(s, [end - 2.2, end - 0.3], [1, 0], clamp);
-  const drift = interpolate(s, [end - 2.2, end - 0.3], [0, -14], clamp);
-  const shade = interpolate(s, [0.4, 2, end - 2.2, end - 0.3], [0, 1, 1, 0], clamp);
-  const tracking = interpolate(s, [0.6, end], [16, 22], clamp);
-  const letters = title.length || 1;
-  const step = Math.min(0.09, 1.6 / letters);
-  const titleDone = 1.2 + letters * step + 0.6;
-  const rule = ease(interpolate(s, [titleDone - 0.4, titleDone + 1.2], [0, 1], clamp));
-  const sub = ease(interpolate(s, [titleDone + 0.2, titleDone + 1.8], [0, 1], clamp));
-  const ch = ease(interpolate(s, [0.6, 2.2], [0, 1], clamp));
-  const ivory = "#f2efe8";
+  const black = interpolate(s, [0, 2.8], [1, 0], clamp);
+  const appear = (a, d = 2.2) => ease(interpolate(s, [a, a + d], [0, 1], clamp));
+  const out = interpolate(s, [end - 2.6, end - 0.2], [1, 0], clamp);
+  const band = Math.min(appear(0.8, 2.5), out);
+  const tracking = interpolate(s, [1.6, end], [0.34, 0.42], clamp); // em
+  const ivory = "#f3f0ea";
+  const pair = SIZE; // per-font optical size
   return (
     <AbsoluteFill>
-      <AbsoluteFill style={{ background: "radial-gradient(ellipse 70% 55% at center, rgba(0,0,0,0.38), rgba(0,0,0,0) 75%)", opacity: shade }} />
-      <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", textAlign: "center", color: ivory, padding: "0 180px",
-        opacity: out, transform: `translateY(${drift}px)`, textShadow: "0 0 36px rgba(0,0,0,0.5)" }}>
+      {/* a very soft horizontal band for legibility, instead of a heavy vignette */}
+      <AbsoluteFill style={{ background: "linear-gradient(180deg, transparent 30%, rgba(0,0,0,0.32) 44%, rgba(0,0,0,0.32) 58%, transparent 72%)", opacity: band }} />
+      <AbsoluteFill style={{ alignItems: "center", justifyContent: "center", textAlign: "center", color: ivory, opacity: out, textShadow: "0 0 30px rgba(0,0,0,0.45)" }}>
         {channel && (
-          <div style={{ display: "flex", alignItems: "center", gap: 24, marginBottom: 42, opacity: 0.85 * ch }}>
-            <div style={{ width: 56, height: 1, background: ivory, opacity: 0.7, transform: `scaleX(${ch})`, transformOrigin: "right" }} />
-            <div style={{ fontFamily: SANS, fontSize: 21, fontWeight: 400, letterSpacing: 11, textTransform: "uppercase", paddingLeft: 10 }}>{channel}</div>
-            <div style={{ width: 56, height: 1, background: ivory, opacity: 0.7, transform: `scaleX(${ch})`, transformOrigin: "left" }} />
-          </div>
+          <div style={{ fontFamily: SANS, fontSize: 18, fontWeight: 400, letterSpacing: "0.5em", textTransform: "uppercase", marginRight: "-0.5em", opacity: 0.75 * appear(0.9) }}>{channel}</div>
         )}
-        <Letters text={title.toUpperCase()} s={s} start={1.2} step={step}
-          style={{ fontFamily: SERIF, fontSize: Math.round(100 * SIZE), fontWeight: SERIF_W, letterSpacing: tracking, lineHeight: 1.05, marginRight: -tracking }} />
-        {subtitle && <div style={{ width: 180, height: 1, background: `linear-gradient(90deg, transparent, ${ivory}aa, transparent)`, margin: "40px 0 30px", transform: `scaleX(${rule})` }} />}
-        {subtitle && <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: Math.round(40 * SIZE), fontWeight: SERIF_W, letterSpacing: 1.5, opacity: 0.88 * sub, transform: `translateY(${(1 - sub) * 6}px)` }}>{subtitle}</div>}
+        {channel && <div style={{ width: 1, height: 34, background: ivory, opacity: 0.4 * appear(1.4), margin: "26px 0 30px" }} />}
+        <div style={{ fontFamily: SERIF, fontWeight: SERIF_W, fontSize: Math.round(64 * pair), letterSpacing: `${tracking}em`, marginRight: `-${tracking}em`,
+          textTransform: "uppercase", lineHeight: 1.1, opacity: appear(1.6, 2.8) }}>{title}</div>
+        {subtitle && <div style={{ width: 64, height: 1, background: ivory, opacity: 0.5 * appear(3.4), margin: "34px 0 26px" }} />}
+        {subtitle && <div style={{ fontFamily: SERIF, fontStyle: "italic", fontWeight: SERIF_W, fontSize: Math.round(30 * pair), letterSpacing: "0.04em", opacity: 0.82 * appear(3.8) }}>{subtitle}</div>}
       </AbsoluteFill>
       <AbsoluteFill style={{ backgroundColor: "black", opacity: black }} />
     </AbsoluteFill>
