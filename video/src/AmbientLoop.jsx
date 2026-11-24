@@ -1,5 +1,5 @@
-import { useLayoutEffect, useRef } from "react";
-import { AbsoluteFill, Img, staticFile, useCurrentFrame, useVideoConfig, random } from "remotion";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { AbsoluteFill, Img, staticFile, useCurrentFrame, useVideoConfig, random, delayRender, continueRender } from "remotion";
 
 /*
  * Every motion here is periodic over the composition length, so the rendered clip
@@ -18,7 +18,22 @@ export const AmbientLoop = (props) => {
 };
 
 /** The ambient scene at a given loop phase (0..1). */
-export const Scene = ({ image, overlays: o, renderScale = 1, phase, grainFrame = 0 }) => {
+/** Loads an image element for canvas drawing; holds the render until it is ready. */
+function useImageElement(src) {
+  const [img, setImg] = useState(null);
+  useEffect(() => {
+    if (!src) { setImg(null); return; }
+    const handle = delayRender("load " + src.slice(0, 40), { timeoutInMilliseconds: 120000 });
+    const el = new Image();
+    el.onload = () => { setImg(el); continueRender(handle); };
+    el.onerror = () => continueRender(handle);
+    el.src = src;
+    return () => continueRender(handle);
+  }, [src]);
+  return img;
+}
+
+export const Scene = ({ image, overlays: o, renderScale = 1, phase, grainFrame = 0, water }) => {
   const { width, height } = useVideoConfig();
   const p = phase;
   const frame = grainFrame;
@@ -29,7 +44,16 @@ export const Scene = ({ image, overlays: o, renderScale = 1, phase, grainFrame =
 
   // Canvas resolution follows the output resolution so stars and particles stay crisp in 4K.
   const W = Math.round(width * renderScale), H = Math.round(height * renderScale);
-  const lightRef = useRef(null), fogRef = useRef(null), grainRef = useRef(null);
+  const lightRef = useRef(null), fogRef = useRef(null), grainRef = useRef(null), waterRef = useRef(null);
+  const src = /^(blob:|data:|https?:)/.test(image) ? image : staticFile(image);
+  const waterOn = !!(water?.enabled && water.mask);
+  const imgEl = useImageElement(waterOn ? src : null);
+  const maskEl = useImageElement(waterOn ? water.mask : null);
+
+  useLayoutEffect(() => {
+    const c = waterRef.current; if (!c || !waterOn || !imgEl || !maskEl) return;
+    drawWater(c.getContext("2d"), p, W, H, imgEl, maskEl, water);
+  }, [p, W, H, imgEl, maskEl, waterOn, water]);
   const FW = Math.round(W / 2), FH = Math.round(H / 2); // fog is soft: half resolution is invisible and 4× cheaper
 
   useLayoutEffect(() => {
@@ -63,9 +87,10 @@ export const Scene = ({ image, overlays: o, renderScale = 1, phase, grainFrame =
   const fill = { position: "absolute", inset: 0, width: "100%", height: "100%" };
   return (
     <AbsoluteFill style={{ backgroundColor: "black", overflow: "hidden" }}>
-      <Img maxRetries={6} delayRenderTimeoutInMilliseconds={120000} src={/^(blob:|data:|https?:)/.test(image) ? image : staticFile(image)} style={{
+      <Img maxRetries={6} delayRenderTimeoutInMilliseconds={120000} src={src} style={{
         ...fill, objectFit: "cover", transform: `scale(${scale})`,
       }} />
+      {waterOn && <canvas ref={waterRef} width={W} height={H} style={{ ...fill, transform: `scale(${scale})` }} />}
       {breathe !== 0 && <AbsoluteFill style={{ backgroundColor: breathe > 0 ? "white" : "black", opacity: Math.abs(breathe) }} />}
       {o.fog && <canvas ref={fogRef} width={FW} height={FH} style={{ ...fill, mixBlendMode: "screen" }} />}
       <canvas ref={lightRef} width={W} height={H} style={{ ...fill, mixBlendMode: "screen" }} />
@@ -248,4 +273,71 @@ function grainTexture(n) {
     }
     ctx.putImageData(img, 0, 0);
   });
+}
+
+/* ---------- Living water: rippling reflection, drop rings and glints, only inside the painted mask ---------- */
+const featherCache = new WeakMap();
+function featheredMask(mask, W, H) {
+  let byKey = featherCache.get(mask);
+  if (!byKey) featherCache.set(mask, (byKey = new Map()));
+  const key = W + "x" + H;
+  if (!byKey.has(key)) {
+    const c = document.createElement("canvas"); c.width = W; c.height = H;
+    const ctx = c.getContext("2d");
+    ctx.filter = `blur(${Math.round(6 * W / 1920)}px)`;
+    ctx.drawImage(mask, 0, 0, W, H);
+    byKey.set(key, c);
+  }
+  return byKey.get(key);
+}
+function drawWater(ctx, p, W, H, img, mask, w) {
+  const s = W / 1920;
+  ctx.globalCompositeOperation = "source-over";
+  ctx.clearRect(0, 0, W, H);
+  // cover-fit source rectangle (same framing as the background image)
+  const ir = img.width / img.height, r = W / H;
+  let sw, sh, sx, sy;
+  if (ir > r) { sh = img.height; sw = sh * r; sx = (img.width - sw) / 2; sy = 0; }
+  else { sw = img.width; sh = sw / r; sx = 0; sy = (img.height - sh) / 2; }
+  // 1. Ripple: thin horizontal strips shifted by slow, broad sine waves (integer cycles → seamless loop).
+  //    Waves are finer and smaller far away (top) and a bit larger near the camera (bottom), like real water.
+  const A = (w.ripple ?? 0.5) * 2.2 * s, S = Math.max(1, Math.round(1.5 * s));
+  if (A > 0) {
+    for (let y = 0; y < H; y += S) {
+      const v = y / H, near = 0.35 + 0.65 * v;
+      const dx = A * near * (Math.sin(TAU * (v * 7 / near + p)) + 0.35 * Math.sin(TAU * (v * 16 / near - p * 2)));
+      ctx.drawImage(img, sx, sy + v * sh, sw, sh * S / H, dx, y, W, S);
+    }
+  } else ctx.drawImage(img, sx, sy, sw, sh, 0, 0, W, H);
+  // 2. Drop rings: expanding, fading ellipses (perspective-flattened)
+  const drops = Math.round((w.drops ?? 0.4) * 24);
+  ctx.globalCompositeOperation = "lighter";
+  ctx.strokeStyle = "white";
+  for (let i = 0; i < drops; i++) {
+    const q = (k) => random(`drop${k}${i}`);
+    const cycles = 1 + Math.floor(q("c") * 2);
+    const t = (((p * cycles + q("p")) % 1) + 1) % 1;
+    if (t > 0.6) continue; // rest between drops
+    const tt = t / 0.6, rad = (8 + tt * 70) * s * (0.6 + q("s") * 0.8);
+    ctx.globalAlpha = Math.pow(1 - tt, 1.6) * 0.38;
+    ctx.lineWidth = 1.6 * s;
+    for (const k of [1, 0.62]) {
+      ctx.beginPath(); ctx.ellipse(q("x") * W, (0.35 + q("y") * 0.65) * H, rad * k, rad * k * 0.26, 0, 0, TAU); ctx.stroke();
+    }
+  }
+  // 3. Glints: tiny highlights that twinkle on the surface
+  const glints = Math.round((w.shimmer ?? 0.4) * 260);
+  ctx.fillStyle = "white";
+  for (let i = 0; i < glints; i++) {
+    const q = (k) => random(`glint${k}${i}`);
+    const tw = Math.max(0, Math.sin(TAU * (p * (1 + Math.floor(q("f") * 4)) + q("p"))));
+    ctx.globalAlpha = Math.pow(tw, 6) * 0.55;
+    if (ctx.globalAlpha < 0.01) continue;
+    ctx.beginPath(); ctx.ellipse(q("x") * W, (0.3 + q("y") * 0.7) * H, (1.6 + q("s") * 2.4) * s, 0.7 * s, 0, 0, TAU); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  // keep only the painted water area (soft edges)
+  ctx.globalCompositeOperation = "destination-in";
+  ctx.drawImage(featheredMask(mask, W, H), 0, 0, W, H);
+  ctx.globalCompositeOperation = "source-over";
 }

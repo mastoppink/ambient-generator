@@ -5,6 +5,7 @@ import { renderMediaOnWeb, canRenderMediaOnWeb, getEncodableVideoCodecs } from "
 import { AmbientFull, segmentFrames, FONT_PAIRS, INTRO_STYLES, INTRO_LAYOUTS, TONES, CTA_STYLES } from "../src/Full.jsx";
 import { defaultProps } from "../src/Root.jsx";
 import { muxLoopWithAudio, audioDuration } from "./mux.js";
+import { MaskEditor } from "./MaskEditor.jsx";
 import { PRESETS, DEFAULT_GRADE, presetFor, applyGrade } from "./grade.js";
 
 // Video bitrate (bits/s) per resolution and quality. "high" matches YouTube's upload recommendation.
@@ -33,6 +34,7 @@ function initialConfig() {
     loopSeconds: Math.max(10, Math.round(c.loopSeconds / 2) * 2),
     intro: { enabled: true, seconds: 10, reveal: "horizon", layout: "center", tone: "ivory", title: t || "Ambient", subtitle: rest.join(" · "), channel: "The Quiet Ruins", ...c.intro },
     fontPair: c.fontPair || "classic",
+    water: { enabled: false, mask: null, ripple: 0.5, drops: 0.4, shimmer: 0.4, ...c.water },
     cta: { enabled: true, style: "caption", text: "For more quiet places,", button: "Subscribe", start: 2, hold: 8, firstMin: 1, everyMin: 20, ...c.cta },
   };
 }
@@ -65,6 +67,7 @@ function App() {
   const durationInFrames = seg.total;
   const [previewPart, setPreviewPart] = useState("loop");
   const setIntro = (patch) => setCfg((c) => ({ ...c, intro: { ...c.intro, ...patch } }));
+  const setWater = (patch) => setCfg((c) => ({ ...c, water: { ...c.water, ...patch } }));
   const setCta = (patch) => setCfg((c) => ({ ...c, cta: { ...c.cta, ...patch } }));
   const range = previewPart === "intro" && seg.I ? [0, seg.I - 1]
     : previewPart === "cta" && seg.C ? [seg.I + seg.L, seg.total - 1]
@@ -326,7 +329,21 @@ function App() {
           </div>
         )}
 
-        <h2><span className="num">04</span> Overlay</h2>
+        <h2><span className="num">04</span> Air Hidup</h2>
+        <label className="toggle"><input type="checkbox" checked={cfg.water.enabled} onChange={(e) => setWater({ enabled: e.target.checked })} /> Hidupkan permukaan air (riak, tetesan, kilau)</label>
+        {cfg.water.enabled && (
+          <>
+            <p className="hint" style={{ margin: "6px 0 8px" }}>Warnai area air dengan kuas. Hanya area itu yang bergerak.{!cfg.water.mask && <b> Belum ada area air.</b>}</p>
+            {imageUrl ? <MaskEditor imageUrl={imageUrl} mask={cfg.water.mask} onChange={(mask) => setWater({ mask })} /> : <p className="hint">Pilih gambar dulu.</p>}
+            <div className="grid2" style={{ marginTop: 10 }}>
+              <Range label="Riak pantulan" v={cfg.water.ripple} max={1} onChange={(v) => setWater({ ripple: v })} />
+              <Range label="Tetesan" v={cfg.water.drops} max={1} onChange={(v) => setWater({ drops: v })} />
+              <Range label="Kilau" v={cfg.water.shimmer} max={1} onChange={(v) => setWater({ shimmer: v })} />
+            </div>
+          </>
+        )}
+
+        <h2><span className="num">05</span> Overlay</h2>
         <div className="grid2">
           <Range label="Kabut" v={o.fog?.opacity ?? 0} max={0.6} onChange={(v) => setO({ fog: { ...o.fog, opacity: v } })} />
           <label className="row"><span>Warna kabut</span><input type="color" value={o.fog?.color || "#ffffff"} onChange={(e) => setO({ fog: { ...o.fog, color: e.target.value } })} /></label>
