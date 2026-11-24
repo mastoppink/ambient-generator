@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dark Ambient Prompt Generator</title>
+  <meta name="description" content="Generator prompt gambar bertema kenopsia, megalophobia, liminal space, dan dark ambient.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@400;500&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+  <header class="hero">
+    <h1>Dark Ambient<br><span>Prompt Generator</span></h1>
+    <p>Kenopsia · Megalophobia · Liminal Space</p>
+  </header>
+
+  <main class="layout">
+    <section class="controls">
+      <h2><span class="num">01</span> Landscape</h2>
+      <div id="landscapes" class="cards"></div>
+
+      <h2><span class="num">02</span> Nuansa</h2>
+      <div id="moods" class="moods"></div>
+
+      <h2><span class="num">03</span> Detail</h2>
+      <div id="fields"></div>
+
+      <h2><span class="num">04</span> Tambahan</h2>
+      <input id="extra" class="custom" placeholder="Kata kunci tambahan, mis. 8k, volumetric lighting">
+    </section>
+
+    <section class="output">
+      <div class="panel">
+        <div class="toolbar">
+          <label>Format <select id="format"></select></label>
+          <label id="aspect-wrap">Aspect <select id="aspect"></select></label>
+          <label class="toggle"><input type="checkbox" id="negative"> Negative prompt</label>
+        </div>
+
+        <div class="out-head"><span>Prompt</span><small id="char-count"></small></div>
+        <textarea id="out-positive" readonly rows="9"></textarea>
+        <div class="actions">
+          <button id="copy-positive" class="primary" type="button">Salin Prompt</button>
+          <button id="randomize" type="button">🎲 Acak</button>
+          <button id="copy-link" type="button">Salin Link</button>
+          <button id="reset" type="button" class="ghost">Reset</button>
+        </div>
+
+        <div id="neg-block">
+          <div class="out-head"><span>Negative Prompt</span></div>
+          <textarea id="out-negative" readonly rows="3"></textarea>
+          <div class="actions"><button id="copy-negative" type="button">Salin Negative</button></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="out-head"><span>Riwayat</span><button id="clear-history" type="button" class="ghost small">Hapus</button></div>
+        <ul id="history"></ul>
+      </div>
+    </section>
+  </main>
+
+  <footer>Static app · GitHub Pages</footer>
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
