@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@400;500&family=JetBrains+Mono&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./css/style.css?v=13">
+  <link rel="stylesheet" href="./css/style.css?v=14">
 </head>
 <body>
   <header class="hero">
@@ -58,6 +58,17 @@
       </div>
 
       <div class="panel">
+        <div class="out-head"><span>Prompt Revisi</span><small>kirim di chat yang sama setelah gambar jadi</small></div>
+        <p class="hint" style="margin:0 0 8px">Pilih masalah pada gambar (boleh lebih dari satu):</p>
+        <div id="revisions" class="chips"></div>
+        <textarea id="revision-out" readonly rows="4" placeholder="Pilih satu atau lebih masalah di atas"></textarea>
+        <div class="actions">
+          <button id="copy-revision" type="button" class="primary">Salin Prompt Revisi</button>
+          <button id="clear-revision" type="button" class="ghost">Kosongkan</button>
+        </div>
+      </div>
+
+      <div class="panel">
         <div class="out-head"><span>Overlay &amp; Motion</span></div>
         <ul id="overlay-notes" class="notes"></ul>
         <div class="actions"><button id="copy-notes" type="button">Salin Catatan</button>
@@ -80,6 +91,6 @@
   </main>
 
   <footer>Static app · GitHub Pages</footer>
-  <script type="module" src="./js/app.js?v=13"></script>
+  <script type="module" src="./js/app.js?v=14"></script>
 </body>
 </html>

@@ -10,6 +10,7 @@ Web statis untuk merakit prompt gambar bertema **kenopsia, megalophobia, liminal
 - **Auto dari judul audio**: ketik judul (Inggris/Indonesia), generator mendeteksi kata kunci untuk memilih landscape, nuansa, detail dan kalimat suasana. Memahami bank kata judul ambient: mode/suasana (Lydian–Phrygian), kecerahan, citra luar angkasa (jadi langit), melodi, tujuan, bentuk lagu, nama chapter; kata terlarang (432, Hz, binaural, healing, …) diabaikan. Judul yang sama selalu memberi hasil yang sama. Aturannya ada di `RULES` dalam `js/title.js`
 - Gaya **Fotorealistis** (default) atau Matte Painting
 - Panel **Overlay & Motion**: catatan editing, prompt aset overlay (latar hitam untuk blend Screen) dan unduh config untuk video
+- **Prompt Revisi**: pilih masalah pada gambar (miniatur, tempelan, terlalu ramai, terlalu terang, dll.) → salin instruksi edit untuk dikirim di chat Nano Banana yang sama
 - Toggle "Ruang untuk judul", kalimat tambahan bebas
 - Tombol acak, salin, link share (state tersimpan di URL) dan riwayat (localStorage)
 

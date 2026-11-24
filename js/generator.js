@@ -1,4 +1,4 @@
-import { TITLE_SPACE, DESERTED, STYLES, LANDSCAPES, MOODS, FRAMINGS, TWISTS, EMPTINESS } from "./data.js?v=13";
+import { TITLE_SPACE, DESERTED, STYLES, LANDSCAPES, MOODS, FRAMINGS, TWISTS, EMPTINESS } from "./data.js?v=14";
 
 /** Per-landscape fields */
 export const FIELDS = ["structure", "foreground", "decay", "atmosphere", "lighting"];

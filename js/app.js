@@ -1,9 +1,9 @@
-import { LANDSCAPES, MOODS, ASPECTS } from "./data.js?v=13";
+import { LANDSCAPES, MOODS, ASPECTS, REVISIONS } from "./data.js?v=14";
 import {
   ALL_FIELDS, SINGLE, optionsFor, getLandscape, defaultSelection, buildPrompt, randomState, serialize, parse,
-} from "./generator.js?v=13";
-import { stateFromTitle } from "./title.js?v=13";
-import { overlayPlan, overlayNotes, overlayAssetPrompts, videoConfig } from "./overlays.js?v=13";
+} from "./generator.js?v=14";
+import { stateFromTitle } from "./title.js?v=14";
+import { overlayPlan, overlayNotes, overlayAssetPrompts, videoConfig } from "./overlays.js?v=14";
 
 const $ = (s) => document.querySelector(s);
 const FIELD_LABELS = {
@@ -167,4 +167,22 @@ function generateFromTitle() {
 $("#title-generate").addEventListener("click", generateFromTitle);
 $("#title-input").addEventListener("keydown", (e) => { if (e.key === "Enter") generateFromTitle(); });
 
-renderAll(); renderHistory();
+/* ---------- revision prompts ---------- */
+const revSel = new Set();
+function renderRevisions() {
+  $("#revisions").innerHTML = REVISIONS.map((r, i) =>
+    `<button type="button" class="chip ${revSel.has(i) ? "active" : ""}" data-i="${i}" aria-pressed="${revSel.has(i)}">${esc(r.label)}</button>`).join("");
+  const picked = [...revSel].sort((a, b) => a - b).map((i) => REVISIONS[i].text);
+  $("#revision-out").value = picked.length
+    ? `Edit this image. Keep the composition, subject, style and mood the same, and only change the following: ${picked.join(" ")}`
+    : "";
+  $("#copy-revision").disabled = !picked.length;
+}
+$("#revisions").addEventListener("click", (e) => {
+  const b = e.target.closest(".chip"); if (!b) return;
+  const i = +b.dataset.i; revSel.has(i) ? revSel.delete(i) : revSel.add(i); renderRevisions();
+});
+$("#copy-revision").addEventListener("click", (e) => copy($("#revision-out").value, e.target));
+$("#clear-revision").addEventListener("click", () => { revSel.clear(); renderRevisions(); });
+
+renderAll(); renderHistory(); renderRevisions();

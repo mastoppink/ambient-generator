@@ -135,3 +135,21 @@ export const MOODS = [
 ];
 
 export const ASPECTS = ["16:9", "21:9", "9:16", "1:1", "3:2", "2:3"];
+
+/** Follow-up edit instructions for Nano Banana (sent in the same chat, after an image was generated). */
+export const REVISIONS = [
+  { label: "Terlihat miniatur", text: "Remove the miniature / tilt-shift look: use deep focus so the foreground and background are both sharp, and make the structure feel truly monumental and real-world sized." },
+  { label: "Terlihat tempelan", text: "Integrate the structure into the scene: apply the same haze, light direction and color grading to it, soften its contrast with distance, and cover it with the same dust or sediment as the ground." },
+  { label: "Subjek terlalu kecil", text: "Make the main structure noticeably larger and closer, about a third of the frame height, while keeping the empty space around it." },
+  { label: "Subjek terlalu besar", text: "Move the camera further back so the structure becomes smaller and more distant, with more empty space and haze around it." },
+  { label: "Terlalu ramai", text: "Simplify the image: remove most of the debris, branches and small objects, keep the ground calm and clean, and keep only the main structure and the atmosphere." },
+  { label: "Terlalu terang", text: "Make the whole image darker and moodier: lower the exposure, deepen the shadows, and keep only a faint, soft light." },
+  { label: "Terlalu gelap", text: "Lift the shadows slightly so the structure and its details are readable, while keeping the dark, quiet mood." },
+  { label: "Warna terlalu kuat", text: "Desaturate the colors and lower the contrast for a muted, calm, filmic look." },
+  { label: "Kabut kurang", text: "Add more layered atmospheric haze between the camera and the structure, so the background fades softly." },
+  { label: "Terlalu berkabut", text: "Reduce the haze slightly so the structure's shape and weathered details are clearer, keeping a soft atmosphere." },
+  { label: "Mirip bangunan terkenal", text: "Redesign the structure so it no longer resembles any real or famous landmark: give it an original, unique architecture while keeping the same style and mood." },
+  { label: "Kurang nyata", text: "Make it look like a real photograph: natural light, real weathered materials, subtle film grain and lens imperfections, no painterly or CGI look." },
+  { label: "Ada objek aneh", text: "Remove any people, animals, vehicles, text, doors, lights or other out-of-place objects from the scene." },
+  { label: "Ruang judul kurang", text: "Keep a larger calm, empty area of sky or haze, free of details, where a title can be placed." },
+];
