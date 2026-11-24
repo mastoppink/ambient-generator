@@ -1,12 +1,12 @@
-import { TITLE_SPACE, DESERTED, STYLES, LANDSCAPES, MOODS, DISTANCES, EMPTINESS } from "./data.js?v=11";
+import { TITLE_SPACE, DESERTED, STYLES, LANDSCAPES, MOODS, FRAMINGS, TWISTS, EMPTINESS } from "./data.js?v=12";
 
 /** Per-landscape fields */
 export const FIELDS = ["structure", "foreground", "decay", "atmosphere", "lighting"];
 /** Global fields (same options for every landscape) */
-export const GLOBAL = { distance: DISTANCES, emptiness: EMPTINESS };
+export const GLOBAL = { framing: FRAMINGS.map((f) => f.label), twist: TWISTS.map((t) => t || "(tanpa kejutan)"), emptiness: EMPTINESS };
 export const ALL_FIELDS = [...FIELDS, ...Object.keys(GLOBAL)];
-export const SINGLE = new Set(["structure", "distance", "foreground"]);
-const KEYS = { structure: "s", foreground: "o", decay: "d", atmosphere: "a", lighting: "g", distance: "x", emptiness: "e" };
+export const SINGLE = new Set(["structure", "framing", "twist", "foreground"]);
+const KEYS = { structure: "s", foreground: "o", decay: "d", atmosphere: "a", lighting: "g", framing: "c", twist: "w", emptiness: "e" };
 
 export const getLandscape = (id) => LANDSCAPES.find((l) => l.id === id) || LANDSCAPES[0];
 export const getMood = (id) => MOODS.find((m) => m.id === id) || MOODS[0];
@@ -15,8 +15,12 @@ export const optionsFor = (l, f) => GLOBAL[f] || l[f];
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 const join = (arr, sep = ", ") => arr.filter(Boolean).join(sep);
 
+/** First option everywhere, except framing and twist which are random so images don't repeat. */
 export function defaultSelection() {
-  return Object.fromEntries(ALL_FIELDS.map((f) => [f, [0]]));
+  const sel = Object.fromEntries(ALL_FIELDS.map((f) => [f, [0]]));
+  sel.framing = [Math.floor(Math.random() * FRAMINGS.length)];
+  sel.twist = [Math.floor(Math.random() * TWISTS.length)];
+  return sel;
 }
 
 const ASPECT_TEXT = {
@@ -38,11 +42,15 @@ export function buildPrompt(state) {
     return listJoin(items);
   };
   const landscape = state.custom?.landscape?.trim() || l.landscape;
+  const framing = state.custom?.framing?.trim() ? { text: state.custom.framing.trim() } : FRAMINGS[(state.sel.framing || [0])[0]] || FRAMINGS[0];
+  const twist = state.custom?.twist?.trim() || TWISTS[(state.sel.twist || [0])[0]] || "";
   const palette = state.custom?.palette?.trim() || l.palette;
   const sentences = [
     m.camera.replace("{L}", landscape),
-    `A lone ${val("structure") || l.structure[0]} stands ${val("distance")}. It is an original, nameless structure of unique design that does not resemble any real or famous landmark.`,
-    val("foreground") && `In the foreground, ${val("foreground")}, sparse, low and partly out of focus, giving the eye a quiet path into the scene without drawing attention.`,
+    `The main subject is a lone ${val("structure") || l.structure[0]}, an original, nameless structure of unique design that does not resemble any real or famous landmark.`,
+    framing.text,
+    twist && `An unexpected detail: ${twist}.`,
+    framing.fg !== false && val("foreground") && `In the foreground, ${val("foreground")}, sparse, low and partly out of focus, giving the eye a quiet path into the scene without drawing attention.`,
     l.medium && `${l.medium}.`,
     val("decay") && `The structure is worn by time: ${val("decay")}.`,
     val("atmosphere") && `The air is filled with ${val("atmosphere")}.`,
@@ -50,7 +58,7 @@ export function buildPrompt(state) {
     `A barely perceptible, cold glow in the haze behind the structure gently separates its silhouette, making it the focal point without looking like a spotlight.`,
     `The structure belongs naturally to the scene: the same haze softens it, its contrast and sharpness fade with distance like the rest of the environment, the same dim light falls on it, and the same dust or sediment covers it, so nothing looks pasted in.`,
     `The color palette is restrained: ${palette}.`,
-    val("emptiness") && `The composition is dominated by ${val("emptiness")}, with generous empty space around the structure.`,
+    val("emptiness") && `The scene keeps a strong sense of ${val("emptiness")}, with generous empty space around the structure.`,
     m.feeling,
     DESERTED,
     (STYLES[state.style] || STYLES.photo).text,

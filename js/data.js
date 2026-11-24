@@ -1,5 +1,5 @@
 export const TITLE_SPACE =
-  "Leave the upper half of the frame as calm, empty space so a title can be placed there later.";
+  "Keep one calm, uncluttered area of the frame, such as the sky or the haze, where a title could be placed later.";
 
 /** Semantic "negative": Nano Banana has no negative-prompt field, so exclusions are described positively. */
 export const DESERTED =
@@ -8,7 +8,7 @@ export const DESERTED =
 export const STYLES = {
   photo: {
     label: "Fotorealistis",
-    text: "This must look like a real photograph, not a painting, illustration or CGI: shot on a full-frame camera with a 24mm lens at f/8 on a tripod, long exposure, natural available light only, real-world scale and weathered real materials, soft atmospheric haze, subtle film grain, slight lens vignetting and natural noise in the shadows, low contrast and desaturated tones without any oversaturated HDR look, in the spirit of large-format documentary landscape photography. It should feel quiet and meditative, suitable as a still background for a long ambient music video.",
+    text: "This must look like a real photograph, not a painting, illustration or CGI: shot on a full-frame camera on a tripod, long exposure, natural available light only, real-world scale and weathered real materials, soft atmospheric haze, subtle film grain, slight lens vignetting and natural noise in the shadows, low contrast and desaturated tones without any oversaturated HDR look, in the spirit of large-format documentary landscape photography. It should feel quiet and meditative, suitable as a still background for a long ambient music video.",
   },
   matte: {
     label: "Matte Painting",
@@ -16,12 +16,31 @@ export const STYLES = {
   },
 };
 
-// Size/placement of the main structure (sentence: "A lone X stands {distance}.")
-export const DISTANCES = [
-  "in the middle distance, large enough to fill about a third of the frame height",
-  "monumentally in the mid-ground, filling nearly half of the frame height",
-  "far away on the horizon, small but still clearly recognizable in its details",
-  "so tall that its upper part dissolves into the haze above",
+// Framing: camera position, lens, placement. "fg: false" = the framing has its own foreground, skip the foreground field.
+export const FRAMINGS = [
+  { label: "Simetris + pantulan", text: "Composition: perfectly centered and symmetrical, shot head-on at eye level with a 35mm lens; the structure sits in the exact middle and is mirrored in still water or polished ice below it, the horizon cutting the frame in half." },
+  { label: "Dibingkai reruntuhan", fg: false, text: "Composition: frame within a frame, the structure is seen through a large broken archway or shattered window in the dark, out-of-focus foreground, which surrounds it on all sides; 28mm lens." },
+  { label: "Dari dalam ke luar", fg: false, text: "Composition: shot from deep inside the ruin looking outward, its dark collapsed walls and columns forming the edges of the frame, while the open landscape and a second, more distant part of the structure glow faintly through the opening; 24mm lens." },
+  { label: "Drone dari atas", fg: false, text: "Composition: high aerial view looking steeply down from a drone, the structure seen from above in the lower part of the frame, surrounded by vast textured ground patterns that fade into haze at the top; 35mm lens." },
+  { label: "Telefoto berlapis", text: "Composition: long telephoto shot with a 200mm lens, strongly compressing distance; the structure and several fainter layers of ruins and terrain behind it are stacked like paper cut-outs, each layer paler in the haze." },
+  { label: "Low angle menjulang", text: "Composition: extreme low angle from close to the base, looking almost straight up with a 16mm ultra-wide lens; the structure towers out of frame at the top, converging lines vanishing into the haze." },
+  { label: "Muncul sebagian", text: "Composition: only part of the structure enters from the left edge of the frame, huge and cropped, the rest emerging from or dissolving into the fog; the right two-thirds of the frame is empty space; 50mm lens." },
+  { label: "Horizon tinggi", text: "Composition: high horizon near the top of the frame; the ground dominates with rich textures receding into the distance, and the structure stands small but sharp near the top-left, against a thin band of sky; 24mm lens." },
+  { label: "Diagonal menjauh", text: "Composition: the structure stretches diagonally from the near-left corner deep into the distance on the right, its repeated forms shrinking and fading into the haze; 28mm lens, slightly elevated viewpoint." },
+  { label: "Kecil di kiri, ruang luas", text: "Composition: the structure is placed in the far left third, quite small but clearly readable, facing a huge empty space to the right; slightly elevated viewpoint, 35mm lens." },
+];
+
+// Unexpected but believable detail, to avoid predictable images.
+export const TWISTS = [
+  "",
+  "the whole structure leans noticeably to one side, as if slowly sinking into the ground",
+  "a wide staircase climbs its side and ends abruptly in mid-air",
+  "a faint twin of the same structure repeats behind it, half-dissolved in the haze",
+  "it is split in two by a wide crack, with haze flowing slowly through the gap",
+  "a vast circular opening pierces its center, revealing the pale sky behind",
+  "a single colossal fallen statue head lies half-buried near its base",
+  "a lone doorway stands upright in front of it with no walls around it",
+  "its upper part is perfectly intact while its base has crumbled away, as if it should not still be standing",
 ];
 
 export const EMPTINESS = [
@@ -103,16 +122,16 @@ export const LANDSCAPES = [
 // {L} is replaced by the landscape phrase.
 export const MOODS = [
   { id: "solitude", label: "Ambient Solitude", desc: "Kesepian yang meditatif", weight: 4,
-    camera: "A wide, minimalist landscape view of {L}, with a low horizon and the main structure placed off-center on a third of the frame.",
+    camera: "A quiet, minimalist photograph of {L}.",
     feeling: "It feels overwhelmingly empty and lonely, as if time has stopped, and a contemplative silence hangs over everything." },
   { id: "kenopsia", label: "Kenopsia", desc: "Kemegahan yang ditinggalkan", weight: 2,
-    camera: "A wide cinematic establishing shot of {L}, with the main structure placed on a third of the frame, large enough to show its weathered details.",
+    camera: "A cinematic photograph of {L}, full of abandoned grandeur.",
     feeling: "It carries an abandoned grandeur and a ghostly silence, a forsaken monument in slow, poetic decay." },
   { id: "megalophobia", label: "Megalophobia", desc: "Skala raksasa", weight: 2,
-    camera: "A low-angle wide shot of {L}, so that the colossal structure towers over the empty land.",
+    camera: "A photograph of {L} that emphasizes overwhelming, dwarfing scale.",
     feeling: "Its scale is oppressive and dwarfing, an immense emptiness that makes the viewer feel insignificant." },
   { id: "liminal", label: "Liminal Space", desc: "Ruang transisi hampa", weight: 2,
-    camera: "A perfectly symmetrical one-point perspective view of {L}, receding into infinite distance.",
+    camera: "An uncanny, perfectly still photograph of {L}, full of endless repetition.",
     feeling: "It has an uncanny stillness, endless repeating architecture and a surreal sense of isolation." },
 ];
 

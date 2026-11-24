@@ -1,5 +1,5 @@
-import { LANDSCAPES, MOODS } from "./data.js?v=11";
-import { ALL_FIELDS, SINGLE, optionsFor, getLandscape } from "./generator.js?v=11";
+import { LANDSCAPES, MOODS } from "./data.js?v=12";
+import { ALL_FIELDS, SINGLE, optionsFor, getLandscape } from "./generator.js?v=12";
 
 /*
  * Title → prompt rules (English + Indonesian).
@@ -170,7 +170,8 @@ export function stateFromTitle(title, base) {
   const sel = {};
   for (const f of ALL_FIELDS) {
     const opts = optionsFor(l, f);
-    const scored = opts.map((o, i) => [i, optionScore(norm, o)]).filter(([, s]) => s > 0).sort((a, b) => b[1] - a[1]);
+    const scorable = f !== "framing" && f !== "twist";
+    const scored = opts.map((o, i) => [i, scorable ? optionScore(norm, o) : 0]).filter(([, s]) => s > 0).sort((a, b) => b[1] - a[1]);
     if (SINGLE.has(f)) {
       sel[f] = [scored.length ? scored[0][0] : Math.floor(rand() * opts.length)];
     } else {

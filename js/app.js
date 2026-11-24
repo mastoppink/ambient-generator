@@ -1,13 +1,13 @@
-import { LANDSCAPES, MOODS, ASPECTS } from "./data.js?v=11";
+import { LANDSCAPES, MOODS, ASPECTS } from "./data.js?v=12";
 import {
   ALL_FIELDS, SINGLE, optionsFor, getLandscape, defaultSelection, buildPrompt, randomState, serialize, parse,
-} from "./generator.js?v=11";
-import { stateFromTitle } from "./title.js?v=11";
-import { overlayPlan, overlayNotes, overlayAssetPrompts, videoConfig } from "./overlays.js?v=11";
+} from "./generator.js?v=12";
+import { stateFromTitle } from "./title.js?v=12";
+import { overlayPlan, overlayNotes, overlayAssetPrompts, videoConfig } from "./overlays.js?v=12";
 
 const $ = (s) => document.querySelector(s);
 const FIELD_LABELS = {
-  distance: "Ukuran & Jarak", structure: "Structure", foreground: "Foreground", decay: "Decay & Texture", atmosphere: "Atmosphere & Haze", lighting: "Lighting", emptiness: "Emptiness",
+  framing: "Framing", twist: "Kejutan", structure: "Structure", foreground: "Foreground", decay: "Decay & Texture", atmosphere: "Atmosphere & Haze", lighting: "Lighting", emptiness: "Emptiness",
 };
 const HISTORY_KEY = "dap-history";
 
