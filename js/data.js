@@ -3,16 +3,16 @@ export const TITLE_SPACE =
 
 /** Semantic "negative": Nano Banana has no negative-prompt field, so exclusions are described positively. */
 export const DESERTED =
-  "The scene is completely deserted and silent: no people, no animals, no birds, no vehicles, no footprints, no glowing lights or windows, no text or watermark.";
+  "The ground is clean and calm, with very little debris or clutter. The scene is completely deserted and silent: no people, no animals, no birds, no vehicles, no footprints, no glowing lights or windows, no text or watermark.";
 
 export const STYLES = {
   photo: {
     label: "Fotorealistis",
-    text: "This must look like a real photograph, not a painting, illustration or CGI: shot on a full-frame camera on a tripod, long exposure, natural available light only, real-world scale and weathered real materials, soft atmospheric haze, subtle film grain, slight lens vignetting and natural noise in the shadows, low contrast and desaturated tones without any oversaturated HDR look, in the spirit of large-format documentary landscape photography. It should feel quiet and meditative, suitable as a still background for a long ambient music video.",
+    text: "This must look like a real photograph, not a painting, illustration or CGI: shot on a full-frame camera on a tripod, long exposure, deep focus with everything from foreground to background acceptably sharp, true monumental scale with no tilt-shift or miniature look, natural available light only, real-world scale and weathered real materials, soft atmospheric haze, subtle film grain, slight lens vignetting and natural noise in the shadows, low contrast and desaturated tones without any oversaturated HDR look, in the spirit of large-format documentary landscape photography. It should feel quiet and meditative, suitable as a still background for a long ambient music video.",
   },
   matte: {
     label: "Matte Painting",
-    text: "Render it as a cinematic, atmospheric matte painting with soft diffused light, low contrast and desaturated tones, minimal detail in the foreground, and a quiet, meditative feeling, suitable as a still background for a long ambient music video.",
+    text: "Render it as a cinematic, atmospheric matte painting with soft diffused light, low contrast and desaturated tones, minimal detail in the foreground, true monumental scale with no miniature look, and a quiet, meditative feeling, suitable as a still background for a long ambient music video.",
   },
 };
 
@@ -39,7 +39,6 @@ export const TWISTS = [
   "it is split in two by a wide crack, with haze flowing slowly through the gap",
   "a vast circular opening pierces its center, revealing the pale sky behind",
   "a single colossal fallen statue head lies half-buried near its base",
-  "a lone doorway stands upright in front of it with no walls around it",
   "its upper part is perfectly intact while its base has crumbled away, as if it should not still be standing",
 ];
 

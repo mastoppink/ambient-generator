@@ -1,4 +1,4 @@
-import { TITLE_SPACE, DESERTED, STYLES, LANDSCAPES, MOODS, FRAMINGS, TWISTS, EMPTINESS } from "./data.js?v=12";
+import { TITLE_SPACE, DESERTED, STYLES, LANDSCAPES, MOODS, FRAMINGS, TWISTS, EMPTINESS } from "./data.js?v=13";
 
 /** Per-landscape fields */
 export const FIELDS = ["structure", "foreground", "decay", "atmosphere", "lighting"];
@@ -15,10 +15,20 @@ export const optionsFor = (l, f) => GLOBAL[f] || l[f];
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 const join = (arr, sep = ", ") => arr.filter(Boolean).join(sep);
 
+/* Recently used framings are skipped so consecutive images don't share a composition. */
+const recentFramings = [];
+function freshFraming() {
+  const pool = [...FRAMINGS.keys()].filter((i) => !recentFramings.includes(i));
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  recentFramings.push(pick);
+  if (recentFramings.length > 4) recentFramings.shift();
+  return pick;
+}
+
 /** First option everywhere, except framing and twist which are random so images don't repeat. */
 export function defaultSelection() {
   const sel = Object.fromEntries(ALL_FIELDS.map((f) => [f, [0]]));
-  sel.framing = [Math.floor(Math.random() * FRAMINGS.length)];
+  sel.framing = [freshFraming()];
   sel.twist = [Math.floor(Math.random() * TWISTS.length)];
   return sel;
 }
@@ -81,6 +91,7 @@ export function randomState(base) {
   const sel = {};
   for (const f of ALL_FIELDS) {
     const n = optionsFor(l, f).length;
+    if (f === "framing") { sel[f] = [freshFraming()]; continue; }
     if (SINGLE.has(f)) { sel[f] = [Math.floor(Math.random() * n)]; continue; }
     const shuffled = [...Array(n).keys()].sort(() => Math.random() - 0.5);
     const max = f === "emptiness" ? 2 : n;
