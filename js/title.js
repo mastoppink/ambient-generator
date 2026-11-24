@@ -1,5 +1,5 @@
-import { LANDSCAPES, MOODS } from "./data.js?v=10";
-import { ALL_FIELDS, SINGLE, optionsFor, getLandscape } from "./generator.js?v=10";
+import { LANDSCAPES, MOODS } from "./data.js?v=11";
+import { ALL_FIELDS, SINGLE, optionsFor, getLandscape } from "./generator.js?v=11";
 
 /*
  * Title → prompt rules (English + Indonesian).

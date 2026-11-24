@@ -1,4 +1,4 @@
-import { TITLE_SPACE, DESERTED, STYLES, LANDSCAPES, MOODS, DISTANCES, EMPTINESS } from "./data.js?v=10";
+import { TITLE_SPACE, DESERTED, STYLES, LANDSCAPES, MOODS, DISTANCES, EMPTINESS } from "./data.js?v=11";
 
 /** Per-landscape fields */
 export const FIELDS = ["structure", "foreground", "decay", "atmosphere", "lighting"];
@@ -41,12 +41,14 @@ export function buildPrompt(state) {
   const palette = state.custom?.palette?.trim() || l.palette;
   const sentences = [
     m.camera.replace("{L}", landscape),
-    `A lone ${val("structure") || l.structure[0]} stands ${val("distance")}.`,
-    val("foreground") && `In the foreground, ${val("foreground")}, giving the eye a path into the scene.`,
+    `A lone ${val("structure") || l.structure[0]} stands ${val("distance")}. It is an original, nameless structure of unique design that does not resemble any real or famous landmark.`,
+    val("foreground") && `In the foreground, ${val("foreground")}, sparse, low and partly out of focus, giving the eye a quiet path into the scene without drawing attention.`,
+    l.medium && `${l.medium}.`,
     val("decay") && `The structure is worn by time: ${val("decay")}.`,
     val("atmosphere") && `The air is filled with ${val("atmosphere")}.`,
     val("lighting") && `The only light is ${val("lighting")}.`,
-    `A faint, cold glow behind the structure separates its silhouette from the haze and makes it the clear focal point.`,
+    `A barely perceptible, cold glow in the haze behind the structure gently separates its silhouette, making it the focal point without looking like a spotlight.`,
+    `The structure belongs naturally to the scene: the same haze softens it, its contrast and sharpness fade with distance like the rest of the environment, the same dim light falls on it, and the same dust or sediment covers it, so nothing looks pasted in.`,
     `The color palette is restrained: ${palette}.`,
     val("emptiness") && `The composition is dominated by ${val("emptiness")}, with generous empty space around the structure.`,
     m.feeling,
