@@ -6,7 +6,7 @@ export const defaultProps = {
   width: 1920,
   height: 1080,
   fps: 30,
-  loopSeconds: 30,
+  loopSeconds: 20,
   overlays: {
     fog: { color: "#e8eff3", opacity: 0.28 },
     particles: { kind: "snow", count: 220 },
