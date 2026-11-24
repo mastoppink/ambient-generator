@@ -28,3 +28,6 @@
 .upscale button:disabled { border-color: var(--line); color: var(--muted); cursor: default; }
 .dl { color: var(--accent); font-size: .82rem; }
 .upscale select { justify-self: start; max-width: 100%; padding: 6px 8px; font-size: .8rem; }
+.adv { margin: 4px 0 8px; font-size: .85rem; }
+.adv summary { cursor: pointer; color: var(--muted); margin-bottom: 10px; }
+.adv summary small { color: var(--accent); }

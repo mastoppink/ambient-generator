@@ -16,7 +16,7 @@ Web statis untuk merakit prompt gambar bertema **kenopsia, megalophobia, liminal
 - Tombol acak, salin, link share (state tersimpan di URL) dan riwayat (localStorage)
 
 ## Membuat video
-**Video Studio** (`studio.html`) merender video langsung di browser dengan Remotion (`@remotion/web-renderer`): pilih gambar + audio → atur overlay → **Render Video**. Hanya loop pendek yang dirender, lalu diulang sepanjang audio (mediabunny, tanpa render ulang) dan disimpan sebagai MP4. Mendukung **upscale gambar ke 4K** (Real-ESRGAN x4plus untuk detail maksimal atau General x4v3 untuk cepat, via ONNX Runtime Web, WebGPU dengan fallback CPU; model di `models/`) dan **render 1080p / 1440p / 4K**. Butuh Chrome/Edge desktop. Tombol **Buka Video Studio** di generator membawa pengaturan overlay otomatis.
+**Video Studio** (`studio.html`) merender video langsung di browser dengan Remotion (`@remotion/web-renderer`): pilih gambar + audio → atur overlay → **Render Video**. Hanya loop pendek yang dirender, lalu diulang sepanjang audio (mediabunny, tanpa render ulang) dan disimpan sebagai MP4. Mendukung **upscale gambar ke 4K** (Real-ESRGAN x4plus untuk detail maksimal atau General x4v3 untuk cepat, via ONNX Runtime Web, WebGPU dengan fallback CPU; model di `models/`) , **color grading** (10 preset sinematik + slider manual, diterapkan ke gambar sebelum render) dan **render 1080p / 1440p / 4K**. Butuh Chrome/Edge desktop. Tombol **Buka Video Studio** di generator membawa pengaturan overlay otomatis.
 
 Alternatif lewat terminal (Node.js): lihat [`video/README.md`](video/README.md).
 

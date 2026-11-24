@@ -5,6 +5,7 @@ import { renderMediaOnWeb, canRenderMediaOnWeb, getEncodableVideoCodecs } from "
 import { AmbientLoop } from "../src/AmbientLoop.jsx";
 import { defaultProps } from "../src/Root.jsx";
 import { muxLoopWithAudio, audioDuration } from "./mux.js";
+import { PRESETS, DEFAULT_GRADE, presetFor, applyGrade } from "./grade.js";
 
 const RESOLUTIONS = { "1080": { label: "1080p (Full HD)", scale: 1 }, "1440": { label: "1440p (2K)", scale: 4 / 3 }, "2160": { label: "2160p (4K)", scale: 2 } };
 
@@ -44,10 +45,29 @@ function App() {
   const inputProps = useMemo(() => ({ ...cfg, image: imageUrl || "" }), [cfg, imageUrl]);
   const durationInFrames = Math.round(cfg.loopSeconds * cfg.fps);
 
-  useEffect(() => () => imageUrl && URL.revokeObjectURL(imageUrl), [imageUrl]);
+
+  const [preset, setPreset] = useState(() => presetFor(initialConfig().landscape));
+  const [grade, setGrade] = useState(() => ({ ...DEFAULT_GRADE, ...PRESETS[presetFor(initialConfig().landscape)] }));
+  const [grading, setGrading] = useState(false);
+  const setG = (patch) => { setPreset("custom"); setGrade((g) => ({ ...g, ...patch })); };
+  const choosePreset = (k) => { setPreset(k); setGrade((g) => ({ ...DEFAULT_GRADE, ...PRESETS[k], intensity: g.intensity })); };
+
+  // Re-grade the current base image whenever it or the grade changes (debounced).
+  useEffect(() => {
+    if (!imageFile) return;
+    let cancelled = false;
+    setGrading(true);
+    const t = setTimeout(async () => {
+      try {
+        const blob = await applyGrade(imageFile, grade);
+        if (!cancelled) setImageUrl((old) => { if (old) URL.revokeObjectURL(old); return URL.createObjectURL(blob); });
+      } finally { if (!cancelled) setGrading(false); }
+    }, 250);
+    return () => { cancelled = true; clearTimeout(t); };
+  }, [imageFile, grade]);
 
   const useImage = async (blob, name) => {
-    setImageUrl(URL.createObjectURL(blob)); setImageName(name); setImageFile(blob);
+    setImageName(name); setImageFile(blob);
     try { const b = await createImageBitmap(blob); setImageSize([b.width, b.height]); b.close(); } catch { setImageSize(null); }
   };
   const onImage = (f) => { if (!f) return; setUp({ stage: "idle" }); setOrigFile(f); useImage(f, f.name); };
@@ -151,7 +171,8 @@ function App() {
               ? <button type="button" onClick={upscale}>{up.stage === "done" ? "Upscale ulang dari gambar asli" : "Upscale ke 4K (Real-ESRGAN)"}</button>
               : <div className="progress"><div className="bar"><div style={{ width: Math.round(up.progress * 100) + "%" }} /></div>
                   <small>Upscale {Math.round(up.progress * 100)}% · {up.backend === "webgpu" ? "GPU (WebGPU)" : up.backend ? "CPU (lambat, " + (upModel === "max" ? "bisa >10 menit" : "1–2 menit") + ")" : upModel === "max" ? "mengunduh model 67 MB…" : "memuat model…"}</small></div>}
-            {up.stage === "done" && <p className="ok" style={{ margin: 0 }}>✔ Gambar 4K dipakai untuk video · <a className="dl" href={up.url} download={up.name}>Unduh gambar 4K</a></p>}
+            {up.stage === "done" && <p className="ok" style={{ margin: 0 }}>✔ Gambar 4K dipakai untuk video</p>}
+            {imageUrl && <a className="dl" href={imageUrl} download={(imageName || "background").replace(/\.[^.]+$/, "") + "-graded.png"}>Unduh gambar (dengan grading)</a>}
             {up.stage === "error" && <p className="err">✖ {up.message}</p>}
           </div>
         )}
@@ -166,7 +187,32 @@ function App() {
           <small>video-config.json dari generator, atau atur manual di bawah</small>
         </label>
 
-        <h2><span className="num">02</span> Overlay</h2>
+        <h2><span className="num">02</span> Color Grading</h2>
+        <div className="grid2">
+          <label className="row"><span>Preset</span>
+            <select value={preset} onChange={(e) => choosePreset(e.target.value)}>
+              {Object.entries(PRESETS).map(([k, p]) => <option key={k} value={k}>{p.label}</option>)}
+              {preset === "custom" && <option value="custom">Custom</option>}
+            </select></label>
+          <Range label="Intensitas" v={grade.intensity} max={1} onChange={(v) => setGrade((g) => ({ ...g, intensity: v }))} />
+        </div>
+        <details className="adv">
+          <summary>Atur manual {grading && <small>· memproses…</small>}</summary>
+          <div className="grid2">
+            <Range label="Exposure" v={grade.exposure} min={-1} max={1} fmt={sig} onChange={(v) => setG({ exposure: v })} />
+            <Range label="Kontras" v={grade.contrast} min={-0.5} max={0.5} fmt={sig} onChange={(v) => setG({ contrast: v })} />
+            <Range label="Saturasi" v={grade.saturation} min={-1} max={0.5} fmt={sig} onChange={(v) => setG({ saturation: v })} />
+            <Range label="Suhu (biru ↔ hangat)" v={grade.temperature} min={-1} max={1} fmt={sig} onChange={(v) => setG({ temperature: v })} />
+            <Range label="Tint (hijau ↔ magenta)" v={grade.tint} min={-1} max={1} fmt={sig} onChange={(v) => setG({ tint: v })} />
+            <Range label="Fade (hitam pudar)" v={grade.fade} max={1} onChange={(v) => setG({ fade: v })} />
+            <label className="row"><span>Warna bayangan</span><input type="color" value={grade.shadows} onChange={(e) => setG({ shadows: e.target.value })} /></label>
+            <Range label="Kekuatan bayangan" v={grade.shadowAmt} max={1} onChange={(v) => setG({ shadowAmt: v })} />
+            <label className="row"><span>Warna highlight</span><input type="color" value={grade.highlights} onChange={(e) => setG({ highlights: e.target.value })} /></label>
+            <Range label="Kekuatan highlight" v={grade.highlightAmt} max={1} onChange={(v) => setG({ highlightAmt: v })} />
+          </div>
+        </details>
+
+        <h2><span className="num">03</span> Overlay</h2>
         <div className="grid2">
           <Range label="Kabut" v={o.fog?.opacity ?? 0} max={0.6} onChange={(v) => setO({ fog: { ...o.fog, opacity: v } })} />
           <label className="row"><span>Warna kabut</span><input type="color" value={o.fog?.color || "#ffffff"} onChange={(e) => setO({ fog: { ...o.fog, color: e.target.value } })} /></label>
@@ -222,6 +268,8 @@ function App() {
     </main>
   );
 }
+
+const sig = (v) => (v > 0 ? "+" : "") + Math.round(v * 100);
 
 function Range({ label, v, min = 0, max, step = 0.01, fmt = (x) => Math.round(x * 100) + "%", onChange }) {
   return (
