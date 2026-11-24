@@ -72,11 +72,11 @@ function App() {
 
 
   const [preset, setPreset] = useState(() => presetFor(initialConfig().landscape));
-  const [grade, setGrade] = useState(() => ({ ...DEFAULT_GRADE, ...PRESETS[presetFor(initialConfig().landscape)] }));
+  const [grade, setGrade] = useState(() => ({ ...DEFAULT_GRADE, ...PRESETS[presetFor(initialConfig().landscape)], sharpen: 0.35 }));
   const [grading, setGrading] = useState(false);
   const gradedBlobRef = useRef(null);
   const setG = (patch) => { setPreset("custom"); setGrade((g) => ({ ...g, ...patch })); };
-  const choosePreset = (k) => { setPreset(k); setGrade((g) => ({ ...DEFAULT_GRADE, ...PRESETS[k], intensity: g.intensity })); };
+  const choosePreset = (k) => { setPreset(k); setGrade((g) => ({ ...DEFAULT_GRADE, ...PRESETS[k], intensity: g.intensity, sharpen: g.sharpen })); };
 
   // Re-grade the current base image whenever it or the grade changes (debounced).
   useEffect(() => {
@@ -103,7 +103,8 @@ function App() {
 
   async function upscale() {
     if (!origFile) return;
-    const target = { width: Math.round(cfg.width * 2), height: Math.round(cfg.height * 2) };
+    // Oversample: keep ~1.4× the 4K size so the slow zoom only ever scales the image DOWN (stays sharp).
+    const target = { width: Math.round(cfg.width * 2.8), height: Math.round(cfg.height * 2.8) };
     setUp({ stage: "run", progress: 0 });
     try {
       const { upscaleImage } = await import("./upscale.js");
@@ -259,6 +260,7 @@ function App() {
               {preset === "custom" && <option value="custom">Custom</option>}
             </select></label>
           <Range label="Intensitas" v={grade.intensity} max={1} onChange={(v) => setGrade((g) => ({ ...g, intensity: v }))} />
+          <Range label="Ketajaman" v={grade.sharpen} max={1} onChange={(v) => setGrade((g) => ({ ...g, sharpen: v }))} />
         </div>
         <details className="adv">
           <summary>Atur manual {grading && <small>· memproses…</small>}</summary>

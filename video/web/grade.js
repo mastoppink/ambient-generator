@@ -2,7 +2,7 @@
  * Color grading applied to the background image pixels (once, before rendering), so the preview
  * and the rendered video match exactly and rendering stays fast.
  */
-export const DEFAULT_GRADE = { exposure: 0, contrast: 0, saturation: 0, temperature: 0, tint: 0, fade: 0, shadows: "#808080", shadowAmt: 0, highlights: "#808080", highlightAmt: 0, intensity: 1 };
+export const DEFAULT_GRADE = { exposure: 0, contrast: 0, saturation: 0, temperature: 0, tint: 0, fade: 0, shadows: "#808080", shadowAmt: 0, highlights: "#808080", highlightAmt: 0, intensity: 1, sharpen: 0 };
 
 export const PRESETS = {
   none:      { label: "Tanpa grading", ...DEFAULT_GRADE },
@@ -31,7 +31,7 @@ export async function applyGrade(source, grade) {
   const canvas = new OffscreenCanvas(bmp.width, bmp.height);
   const ctx = canvas.getContext("2d", { willReadFrequently: true });
   ctx.drawImage(bmp, 0, 0); bmp.close();
-  const isNeutral = Object.keys(DEFAULT_GRADE).every((k) => k === "intensity" || g[k] === DEFAULT_GRADE[k]);
+  const isNeutral = Object.keys(DEFAULT_GRADE).every((k) => k === "intensity" || k === "sharpen" || g[k] === DEFAULT_GRADE[k]);
   if (!isNeutral && g.intensity > 0) {
     const img = ctx.getImageData(0, 0, canvas.width, canvas.height), d = img.data;
     const exp = Math.pow(2, g.exposure), con = 1 + g.contrast, sat = 1 + g.saturation;
@@ -57,5 +57,23 @@ export async function applyGrade(source, grade) {
     }
     ctx.putImageData(img, 0, 0);
   }
+  if (g.sharpen > 0) sharpen(ctx, canvas.width, canvas.height, g.sharpen);
   return canvas.convertToBlob({ type: "image/jpeg", quality: 0.95 });
+}
+
+/** Unsharp mask (3×3 box blur), amount 0..1 → 0..1.2 extra local contrast. Restores crispness after upscaling. */
+function sharpen(ctx, w, h, amount) {
+  const img = ctx.getImageData(0, 0, w, h), d = img.data, src = new Uint8ClampedArray(d);
+  const k = amount * 1.2, row = w * 4;
+  for (let y = 1; y < h - 1; y++) {
+    for (let x = 1; x < w - 1; x++) {
+      const i = y * row + x * 4;
+      for (let c = 0; c < 3; c++) {
+        const j = i + c;
+        const blur = (src[j - row - 4] + src[j - row] + src[j - row + 4] + src[j - 4] + src[j] + src[j + 4] + src[j + row - 4] + src[j + row] + src[j + row + 4]) / 9;
+        d[j] = src[j] + (src[j] - blur) * k;
+      }
+    }
+  }
+  ctx.putImageData(img, 0, 0);
 }
