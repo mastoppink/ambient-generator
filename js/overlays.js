@@ -86,6 +86,7 @@ export function videoConfig(state, plan) {
     width: state.aspect === "9:16" ? 1080 : 1920,
     height: state.aspect === "9:16" ? 1920 : 1080,
     fps: 30,
+    scale: 2,
     loopSeconds: 30,
     landscape: state.landscape,
     overlays: plan,

@@ -47,7 +47,7 @@ console.log(`▣ Gambar: ${path.basename(image)}`);
 console.log(`↻ Render loop ${props.loopSeconds ?? 30} detik...\n`);
 
 const loop = path.join(outDir, "loop.mp4");
-const renderArgs = ["render", "src/index.jsx", "AmbientLoop", loop, `--props=${propsFile}`, "--codec=h264", "--crf=18"];
+const renderArgs = ["render", "src/index.jsx", "AmbientLoop", loop, `--props=${propsFile}`, "--codec=h264", "--crf=18", `--scale=${props.scale ?? 2}`];
 if (process.env.BROWSER_EXECUTABLE) renderArgs.push(`--browser-executable=${process.env.BROWSER_EXECUTABLE}`);
 run(renderArgs);
 

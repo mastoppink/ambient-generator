@@ -6,6 +6,8 @@ import { AmbientLoop } from "../src/AmbientLoop.jsx";
 import { defaultProps } from "../src/Root.jsx";
 import { muxLoopWithAudio, audioDuration } from "./mux.js";
 
+const RESOLUTIONS = { "1080": { label: "1080p (Full HD)", scale: 1 }, "1440": { label: "1440p (2K)", scale: 4 / 3 }, "2160": { label: "2160p (4K)", scale: 2 } };
+
 const KINDS = ["snow", "rain", "dust", "sediment", "stardust", "sparkle"];
 
 /** Config can arrive from the prompt generator via ?cfg=<base64 json>. */
@@ -26,6 +28,10 @@ function App() {
   const [cfg, setCfg] = useState(initialConfig);
   const [imageUrl, setImageUrl] = useState(null);
   const [imageName, setImageName] = useState("");
+  const [imageFile, setImageFile] = useState(null);
+  const [imageSize, setImageSize] = useState(null);
+  const [up, setUp] = useState({ stage: "idle" });
+  const [resolution, setResolution] = useState(() => (initialConfig().scale === 1 ? "1080" : "2160"));
   const [audio, setAudio] = useState(null);
   const [audioLen, setAudioLen] = useState(0);
   const [status, setStatus] = useState({ stage: "idle" });
@@ -38,7 +44,26 @@ function App() {
 
   useEffect(() => () => imageUrl && URL.revokeObjectURL(imageUrl), [imageUrl]);
 
-  const onImage = (f) => { if (!f) return; setImageUrl(URL.createObjectURL(f)); setImageName(f.name); };
+  const useImage = async (blob, name) => {
+    setImageUrl(URL.createObjectURL(blob)); setImageName(name); setImageFile(blob);
+    try { const b = await createImageBitmap(blob); setImageSize([b.width, b.height]); b.close(); } catch { setImageSize(null); }
+  };
+  const onImage = (f) => { if (!f) return; setUp({ stage: "idle" }); useImage(f, f.name); };
+
+  async function upscale() {
+    if (!imageFile) return;
+    const target = { width: Math.round(cfg.width * 2), height: Math.round(cfg.height * 2) };
+    setUp({ stage: "run", progress: 0 });
+    try {
+      const { upscaleImage } = await import("./upscale.js");
+      const r = await upscaleImage(imageFile, { ...target, onProgress: (p, backend) => setUp({ stage: "run", progress: p, backend }) });
+      const name = imageName.replace(/\.[^.]+$/, "") + "-4k.png";
+      await useImage(r.blob, name);
+      setUp({ stage: "done", url: URL.createObjectURL(r.blob), name, backend: r.backend });
+    } catch (e) {
+      console.error(e); setUp({ stage: "error", message: e?.message || String(e) });
+    }
+  }
   const onAudio = async (f) => {
     if (!f) return;
     setAudio(f); setAudioLen(0);
@@ -63,7 +88,8 @@ function App() {
         id: "AmbientLoop", component: AmbientLoop, durationInFrames,
         fps: cfg.fps, width: cfg.width, height: cfg.height,
       };
-      const check = await canRenderMediaOnWeb({ container: "mp4", videoCodec, width: cfg.width, height: cfg.height });
+      const scale = RESOLUTIONS[resolution].scale;
+      const check = await canRenderMediaOnWeb({ container: "mp4", videoCodec, width: Math.round(cfg.width * scale), height: Math.round(cfg.height * scale) });
       if (!check.canRender) throw new Error(check.issues.map((i) => i.message).join("\n"));
 
       // Ask for the output file first (needs a user gesture) so long videos stream to disk.
@@ -76,7 +102,7 @@ function App() {
 
       setStatus({ stage: "render", progress: 0 });
       const { getBlob } = await renderMediaOnWeb({
-        composition, inputProps, container: "mp4", videoCodec, muted: true,
+        composition, inputProps, container: "mp4", videoCodec, muted: true, scale,
         videoBitrate: "very-high", keyframeIntervalInSeconds: 2,
         licenseKey: "free-license", signal: ctrl.signal,
         onProgress: (p) => setStatus({ stage: "render", progress: p.progress }),
@@ -109,8 +135,18 @@ function App() {
         <label className="file">
           <span>Gambar latar</span>
           <input type="file" accept="image/*" onChange={(e) => onImage(e.target.files[0])} />
-          <small>{imageName || "PNG / JPG / WEBP dari Nano Banana"}</small>
+          <small>{imageName ? `${imageName}${imageSize ? ` · ${imageSize[0]}×${imageSize[1]}` : ""}` : "PNG / JPG / WEBP dari Nano Banana"}</small>
         </label>
+        {imageFile && (
+          <div className="upscale">
+            {up.stage !== "run"
+              ? <button type="button" onClick={upscale} disabled={up.stage === "done"}>{up.stage === "done" ? "✔ Sudah 4K" : "Upscale ke 4K (Real-ESRGAN)"}</button>
+              : <div className="progress"><div className="bar"><div style={{ width: Math.round(up.progress * 100) + "%" }} /></div>
+                  <small>Upscale {Math.round(up.progress * 100)}% · {up.backend === "webgpu" ? "GPU (WebGPU)" : up.backend ? "CPU (lebih lambat)" : "memuat model…"}</small></div>}
+            {up.stage === "done" && <a className="dl" href={up.url} download={up.name}>Unduh gambar 4K</a>}
+            {up.stage === "error" && <p className="err">✖ {up.message}</p>}
+          </div>
+        )}
         <label className="file">
           <span>Audio</span>
           <input type="file" accept="audio/*,.flac,.wav,.m4a" onChange={(e) => onAudio(e.target.files[0])} />
@@ -141,12 +177,16 @@ function App() {
             <label key={k} className="toggle"><input type="checkbox" checked={!!o[k]} onChange={(e) => setO({ [k]: e.target.checked })} /> {l}</label>
           ))}
         </div>
+        <label className="row" style={{ marginBottom: 12 }}><span>Resolusi video</span>
+          <select value={resolution} onChange={(e) => setResolution(e.target.value)}>
+            {Object.entries(RESOLUTIONS).map(([k, r]) => <option key={k} value={k}>{r.label}</option>)}
+          </select></label>
         <Range label="Panjang loop (detik)" v={cfg.loopSeconds} min={10} max={60} step={5} fmt={(v) => v + " d"} onChange={(v) => setCfg((c) => ({ ...c, loopSeconds: v }))} />
       </section>
 
       <section className="output">
         <div className="panel">
-          <div className="out-head"><span>Pratinjau loop</span><small>{cfg.width}×{cfg.height} · {cfg.loopSeconds} d</small></div>
+          <div className="out-head"><span>Pratinjau loop</span><small>render {Math.round(cfg.width * RESOLUTIONS[resolution].scale)}×{Math.round(cfg.height * RESOLUTIONS[resolution].scale)} · loop {cfg.loopSeconds} d</small></div>
           {imageUrl ? (
             <Player component={AmbientLoop} inputProps={inputProps} durationInFrames={durationInFrames}
               fps={cfg.fps} compositionWidth={cfg.width} compositionHeight={cfg.height}
@@ -167,7 +207,7 @@ function App() {
           {status.stage === "error" && <p className="err">✖ {status.message}</p>}
           <p className="hint">
             Hanya loop {cfg.loopSeconds} detik yang dirender, lalu diulang sepanjang audio tanpa render ulang.
-            Semua proses berjalan di browser Anda, tidak ada file yang diunggah. Butuh Chrome atau Edge versi terbaru di desktop.
+            Untuk 4K, upscale gambar dulu agar detailnya tajam. Semua proses berjalan di browser Anda, tidak ada file yang diunggah. Butuh Chrome atau Edge versi terbaru di desktop.
           </p>
         </div>
       </section>

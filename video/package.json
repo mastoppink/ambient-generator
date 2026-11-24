@@ -5,17 +5,18 @@
   "scripts": {
     "studio": "remotion studio src/index.jsx",
     "make": "node make.mjs",
-    "build:web": "esbuild web/main.jsx --bundle --minify --format=esm --jsx=automatic --target=es2022 --outfile=../studio/studio.js --define:process.env.NODE_ENV='\"production\"'"
+    "build:web": "esbuild web/main.jsx --bundle --minify --format=esm --jsx=automatic --target=es2022 --outfile=../studio/studio.js --define:process.env.NODE_ENV='\"production\"' && node scripts/copy-ort.mjs"
   },
   "dependencies": {
+    "@mediabunny/aac-encoder": "1.66.0",
     "@remotion/cli": "4.0.546",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "remotion": "4.0.546",
     "@remotion/player": "4.0.546",
     "@remotion/web-renderer": "4.0.546",
     "mediabunny": "1.66.0",
-    "@mediabunny/aac-encoder": "1.66.0"
+    "onnxruntime-web": "1.23.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "remotion": "4.0.546"
   },
   "devDependencies": {
     "esbuild": "0.28.2"
