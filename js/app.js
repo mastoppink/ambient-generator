@@ -1,15 +1,17 @@
-import { LANDSCAPES, MOODS, ASPECTS, REVISIONS } from "./data.js?v=15";
+import { LANDSCAPES, MOODS, ASPECTS, REVISIONS } from "./data.js?v=16";
 import {
   ALL_FIELDS, SINGLE, optionsFor, getLandscape, defaultSelection, buildPrompt, randomState, serialize, parse,
-} from "./generator.js?v=15";
-import { stateFromTitle } from "./title.js?v=15";
-import { overlayPlan, overlayNotes, overlayAssetPrompts, videoConfig } from "./overlays.js?v=15";
+} from "./generator.js?v=16";
+import { stateFromTitle } from "./title.js?v=16";
+import { overlayPlan, overlayNotes, overlayAssetPrompts, videoConfig } from "./overlays.js?v=16";
 
 const $ = (s) => document.querySelector(s);
 const FIELD_LABELS = {
   framing: "Framing", twist: "Kejutan", structure: "Structure", foreground: "Foreground", decay: "Decay & Texture", atmosphere: "Atmosphere & Haze", lighting: "Lighting", emptiness: "Emptiness",
 };
 const HISTORY_KEY = "dap-history";
+// ?title=... (e.g. from an AI agent) generates straight from an audio title. Read before the URL is rewritten.
+const titleParam = new URLSearchParams(location.search).get("title");
 
 const base = {
   landscape: LANDSCAPES[0].id, mood: MOODS[0].id, sel: defaultSelection(),
@@ -190,3 +192,5 @@ $("#copy-revision").addEventListener("click", (e) => copy($("#revision-out").val
 $("#clear-revision").addEventListener("click", () => { revSel.clear(); renderRevisions(); });
 
 renderAll(); renderHistory(); renderRevisions();
+
+if (titleParam) { $("#title-input").value = titleParam; generateFromTitle(); }

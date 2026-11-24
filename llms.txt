@@ -1,0 +1,16 @@
+# Dark Ambient Prompt Generator + Ambient Video Studio
+
+> Static web app (GitHub Pages) that builds photorealistic image prompts for Nano Banana (Google Gemini image) and turns the image plus an audio file into a long, seamless-looping 4K ambient music video in the browser. Aesthetic: kenopsia, megalophobia, liminal space; a lone original abandoned structure in a vast hazy landscape; no life. UI is in Indonesian.
+
+## Docs
+- [Agent guide](./agents.html): all features, URL API, how to build a prompt without the browser, Video Studio, rules and limits
+- [All options (JSON)](./agent/options.json): landscapes, moods, framings, twists, revision prompts, prompt sentence order, constants, studio config, grading presets (generated from source on every deploy)
+
+## Apps
+- [Prompt Generator](./): `?title=<audio title>` generates everything from a title; or set `l, m, s, o, d, a, g, c, w, e, ar, t, st, x`
+- [Video Studio](./studio.html): `?cfg=<base64 UTF-8 JSON>`; upscale to 4K (Real-ESRGAN), color grading, overlays, render MP4 (1080p/1440p/4K)
+
+## Key rules
+- Nano Banana: narrative sentences, no negative-prompt field, keep prompts ~1,300-1,800 characters (token limit is large, but adherence drops with length)
+- Never real/famous landmarks, people, animals, vehicles, lights, text or watermarks
+- Default aspect 16:9 (YouTube)

@@ -1,4 +1,4 @@
-import { TITLE_SPACE, DESERTED, STYLES, ORIGINAL, INTEGRATE, GLOW, LANDSCAPES, MOODS, FRAMINGS, TWISTS, EMPTINESS } from "./data.js?v=15";
+import { TITLE_SPACE, DESERTED, STYLES, ORIGINAL, INTEGRATE, GLOW, LANDSCAPES, MOODS, FRAMINGS, TWISTS, EMPTINESS } from "./data.js?v=16";
 
 /** Per-landscape fields */
 export const FIELDS = ["structure", "foreground", "decay", "atmosphere", "lighting"];
@@ -110,6 +110,7 @@ export function serialize(state) {
   p.set("ar", state.aspect);
   p.set("t", state.titleSpace ? "1" : "0");
   p.set("st", state.style);
+  if (state.extra?.trim()) p.set("x", state.extra.trim());
   return p.toString();
 }
 
@@ -132,5 +133,6 @@ export function parse(search, base) {
     aspect: p.get("ar") || base.aspect,
     titleSpace: p.get("t") !== "0",
     style: p.get("st") === "matte" ? "matte" : "photo",
+    extra: p.get("x") || "",
   };
 }

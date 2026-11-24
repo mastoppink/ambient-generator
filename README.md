@@ -22,6 +22,11 @@ Alternatif lewat terminal (Node.js): lihat [`video/README.md`](video/README.md).
 
 Kode Video Studio ada di `video/web/` dan di-build oleh workflow GitHub Pages (`npm run build:web` → `studio/studio.js`).
 
+## Untuk agen AI
+- [`agents.html`](agents.html): panduan lengkap fitur, URL API (`?title=…` dan parameter state), cara menyusun prompt tanpa browser
+- [`llms.txt`](llms.txt): ringkasan untuk agen
+- [`agent/options.json`](agent/options.json): semua opsi, dibuat otomatis oleh `node scripts/export-agent-data.mjs` (juga dijalankan workflow)
+
 ## Jalankan lokal
 ```bash
 (cd video && npm install && npm run build:web)   # sekali, untuk Video Studio

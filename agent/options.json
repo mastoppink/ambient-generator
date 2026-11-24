@@ -1,0 +1,745 @@
+{
+  "app": "Dark Ambient Prompt Generator + Ambient Video Studio",
+  "generated": "2026-11-24T03:57:27.402Z",
+  "urls": {
+    "generator": "./",
+    "studio": "./studio.html",
+    "guide": "./agents.html"
+  },
+  "urlParams": {
+    "title": "audio title; the generator picks everything from it (e.g. ?title=Aurora%20%C2%B7%20Weightless%20Ambient%20for%20Sleep)",
+    "l": "landscape id",
+    "m": "mood id",
+    "s": "structure index",
+    "o": "foreground index",
+    "d": "decay indexes (dot-separated)",
+    "a": "atmosphere indexes (dot-separated)",
+    "g": "lighting index",
+    "c": "framing index",
+    "w": "twist index",
+    "e": "emptiness indexes (dot-separated)",
+    "ar": "aspect ratio (16:9 default)",
+    "t": "title space 1/0",
+    "st": "style photo|matte",
+    "x": "extra free sentence"
+  },
+  "promptOrder": [
+    "mood.camera with {L} = landscape phrase",
+    "Subject: a lone {structure}, {ORIGINAL}, {decay}.",
+    "Unexpected detail: {twist}.  (omitted when twist is empty)",
+    "Composition: {framing.text}",
+    "Foreground: {foreground}, sparse and understated.  (omitted when framing.fg === false)",
+    "{landscape.medium}.",
+    "Air: {atmosphere}; light: {lighting}.",
+    "{GLOW}",
+    "{INTEGRATE}",
+    "Palette: {palette}.",
+    "Generous empty space, {emptiness}.",
+    "{mood.feeling}",
+    "{DESERTED}",
+    "{STYLES[style].text}",
+    "{TITLE_SPACE} (if title space on)",
+    "{extra}",
+    "{aspect} format."
+  ],
+  "constants": {
+    "ORIGINAL": "an original, nameless design unlike any real landmark",
+    "INTEGRATE": "It shares the scene's haze, light and dust and fades with distance like everything else, never looking pasted in.",
+    "GLOW": "A faint cold glow in the haze behind it gently separates its silhouette.",
+    "DESERTED": "Clean, calm ground with little debris. No people, animals, vehicles, lights, text or watermark.",
+    "TITLE_SPACE": "Keep one calm, empty area of sky or haze for a title.",
+    "STYLES": {
+      "photo": {
+        "label": "Fotorealistis",
+        "text": "A real photograph, not a painting or CGI: full-frame camera on a tripod, long exposure, deep focus, true monumental scale with no miniature look, natural light, weathered real materials, subtle film grain, low contrast, muted tones, no HDR. Quiet and meditative, a background for a long ambient music video."
+      },
+      "matte": {
+        "label": "Matte Painting",
+        "text": "A cinematic, atmospheric matte painting: soft diffused light, deep focus, true monumental scale, low contrast, muted tones. Quiet and meditative, a background for a long ambient music video."
+      }
+    }
+  },
+  "landscapes": [
+    {
+      "id": "abyssal",
+      "label": "Bawah Air (Abyssal)",
+      "landscape": "the lightless depths of the abyssal ocean",
+      "structure": [
+        "sunken gothic cathedral",
+        "row of submerged monolithic pillars",
+        "drowned stepped ziggurat",
+        "sunken colossal ring-shaped gateway",
+        "underwater spiral tower of stone",
+        "flooded amphitheater carved into a cliff",
+        "fallen colossal statue lying on the seabed",
+        "submerged brutalist research dome"
+      ],
+      "foreground": [
+        "two or three low broken columns half-buried in silt",
+        "rippled silt with a single fallen statue",
+        "a field of pale sea anemone-like stone growths",
+        "an ancient anchor chain trailing across the sand",
+        "the edge of a deep trench dropping into darkness"
+      ],
+      "decay": [
+        "covered in silt and dark algae",
+        "weathered, eroded stonework",
+        "encrusted with pale coral-like growths",
+        "long ribbons of kelp hanging from its edges"
+      ],
+      "atmosphere": [
+        "heavy underwater murk",
+        "floating sediment",
+        "layered murk fading into the deep",
+        "slow drifting particles like underwater snow"
+      ],
+      "lighting": [
+        "faint diffused light from far above",
+        "thin wavering caustic light",
+        "a single shaft of pale light from the surface",
+        "near darkness with a dim blue-green glow"
+      ],
+      "palette": "muted teal, abyssal navy, and slate grey",
+      "medium": "Clearly deep underwater: blue-green water haze, suspended particles, no trees or land plants"
+    },
+    {
+      "id": "desert",
+      "label": "Gurun Pasir (Desert)",
+      "landscape": "a vast windswept desert",
+      "structure": [
+        "half-buried cyclopean temple",
+        "crumbling sandstone aqueduct",
+        "colossal seated statue worn faceless by wind",
+        "stepped pyramid with a collapsed side",
+        "ring of giant standing stones",
+        "abandoned observatory of red stone",
+        "row of colossal gate pylons",
+        "giant ruined water tower of mud brick"
+      ],
+      "foreground": [
+        "one or two half-buried fallen pillars",
+        "sharp wind-carved ripples in the sand",
+        "a cracked dry riverbed",
+        "bleached stone steps vanishing under the sand",
+        "a long low wall almost buried by a dune"
+      ],
+      "decay": [
+        "wind-eroded stone",
+        "dunes swallowing its base",
+        "sandblasted, faceless carvings",
+        "cracked mud-brick walls"
+      ],
+      "atmosphere": [
+        "thick dust haze",
+        "faint heat shimmer",
+        "layered dust fading into the distance",
+        "a slow sandstorm on the horizon"
+      ],
+      "lighting": [
+        "a pale veiled sun behind dust",
+        "flat overcast desert light",
+        "low golden-grey light before dusk",
+        "cold blue light just after sunset"
+      ],
+      "palette": "desaturated ochre, faded sepia, and dusty ash",
+      "medium": "Clearly a vast dry desert: wind-blown sand in the air, everything dusted with sand, no vegetation"
+    },
+    {
+      "id": "frozen",
+      "label": "Tundra / Es (Frozen)",
+      "landscape": "an endless frozen tundra",
+      "structure": [
+        "monumental brutalist citadel",
+        "giant frozen stone arches",
+        "abandoned radar dome station",
+        "colossal frozen dam",
+        "ice-encased cathedral of black stone",
+        "tilted lighthouse locked in sea ice",
+        "massive frozen ship's hull",
+        "ring of frozen monoliths"
+      ],
+      "foreground": [
+        "a path of cracked blue ice",
+        "snow-covered fragments of broken arches",
+        "wind-sculpted snow ridges",
+        "frozen footprints of something long gone, half filled with snow",
+        "a frozen lake surface with trapped bubbles"
+      ],
+      "decay": [
+        "encased in thick ice and rime frost",
+        "snow-drifted ruins",
+        "long icicles hanging from every ledge",
+        "frost-cracked concrete"
+      ],
+      "atmosphere": [
+        "soft whiteout fog",
+        "slowly drifting snow",
+        "layered fog fading into the distance",
+        "fine ice crystals glittering in the air"
+      ],
+      "lighting": [
+        "cold diffused arctic twilight",
+        "a low pale sun barely above the horizon",
+        "blue polar night with faint skylight",
+        "flat white overcast light"
+      ],
+      "palette": "icy pale blue, stark grey, and cold white",
+      "medium": "Clearly a frozen world: ice crystals in the air, frost on every surface, nothing grows"
+    },
+    {
+      "id": "forest",
+      "label": "Hutan Kabut (Forest)",
+      "landscape": "a dead fog-shrouded forest",
+      "structure": [
+        "overgrown ancient viaduct",
+        "forgotten moss-covered sanctuary",
+        "colossal hollow tree-like stone tower",
+        "abandoned stone observatory among dead trees",
+        "collapsed monastery on a hill",
+        "giant moss-covered stone face",
+        "endless overgrown staircase climbing a slope",
+        "derelict railway bridge over a ravine"
+      ],
+      "foreground": [
+        "a moss-covered stone causeway",
+        "still black water reflecting the scene",
+        "a carpet of grey ferns and fallen leaves",
+        "a single fallen trunk lying across the view",
+        "stepping stones across a dark stream"
+      ],
+      "decay": [
+        "choked by dead vines and damp moss",
+        "cracked wet stone",
+        "roots splitting its walls apart",
+        "streaked with dark water stains"
+      ],
+      "atmosphere": [
+        "dense low-lying mist",
+        "light rain haze",
+        "layered mist fading into the distance",
+        "thin fog drifting between bare trunks"
+      ],
+      "lighting": [
+        "weak grey light through a dead canopy",
+        "soft dawn light in the fog",
+        "dim overcast afternoon light",
+        "cold blue dusk"
+      ],
+      "palette": "muted moss green, charcoal, and damp slate",
+      "medium": "Clearly a dead wet forest: damp air, bare grey trunks fading into fog, no green leaves"
+    },
+    {
+      "id": "alien",
+      "label": "Luar Angkasa / Planet Asing",
+      "landscape": "a barren alien planet",
+      "structure": [
+        "derelict megastructure",
+        "ancient obsidian monolith",
+        "colossal ring arch half sunk in the ground",
+        "abandoned spire of fused black glass",
+        "giant crashed vessel overgrown with crystals",
+        "field of enormous geometric pylons",
+        "vast domed habitat cracked open",
+        "impossibly tall needle tower"
+      ],
+      "foreground": [
+        "two or three smaller weathered monoliths",
+        "glassy black rock reflecting the sky",
+        "fine grey dust with geometric fragments",
+        "a shallow crater rim",
+        "pale crystalline shards on the ground"
+      ],
+      "decay": [
+        "weathered alien metal",
+        "dust-covered geometric carvings",
+        "pitted by ancient impacts",
+        "veins of dull crystal through its surface"
+      ],
+      "atmosphere": [
+        "thin cosmic dust",
+        "eerie planetary fog",
+        "layered dust fading into the distance",
+        "a thin haze glowing faintly at the horizon"
+      ],
+      "lighting": [
+        "distant dim starlight",
+        "a huge pale planet low in the sky",
+        "two faint suns behind haze",
+        "the cold glow of a ringed planet"
+      ],
+      "palette": "pitch black, muted indigo, and cold silver",
+      "medium": "Clearly another planet: thin cold atmosphere, alien rock forms, no plants or water"
+    },
+    {
+      "id": "urban",
+      "label": "Kota Kosong (Urban Liminal)",
+      "landscape": "an empty forgotten city",
+      "structure": [
+        "endless flooded concrete atrium",
+        "brutalist megablock",
+        "abandoned unfinished skyscraper skeleton",
+        "empty indoor swimming hall with endless pools",
+        "colossal concrete stairwell",
+        "deserted elevated highway ending in the air",
+        "endless parking structure",
+        "vast empty cooling tower"
+      ],
+      "foreground": [
+        "a flooded floor reflecting like a dark mirror",
+        "a few identical concrete pillars",
+        "tiled floor with shallow still puddles",
+        "rusted railing along a ledge",
+        "a cracked concrete plaza"
+      ],
+      "decay": [
+        "peeling damp concrete",
+        "rusted steel beams",
+        "stagnant still water",
+        "water-stained, mold-darkened walls"
+      ],
+      "atmosphere": [
+        "heavy urban smog",
+        "eerie stillness",
+        "layered smog fading into the distance",
+        "faint mist hanging over still water"
+      ],
+      "lighting": [
+        "dim overcast skylight",
+        "pale light through high skylights",
+        "cold fluorescent-like grey daylight",
+        "soft blue hour light"
+      ],
+      "palette": "washed-out concrete grey, muted cyan, and rust",
+      "medium": "Clearly an abandoned megastructure: still water, damp concrete, faint reflections, no plants or furniture"
+    },
+    {
+      "id": "saltflat",
+      "label": "Danau Garam (Salt Flat)",
+      "landscape": "an endless salt flat covered by a thin layer of water",
+      "structure": [
+        "lone colossal white arch",
+        "abandoned salt-crusted observatory",
+        "row of giant pillars standing in the water",
+        "half-collapsed marble pavilion",
+        "giant stone sphere resting on the salt",
+        "endless colonnade of white stone"
+      ],
+      "foreground": [
+        "hexagonal salt crust patterns",
+        "a mirror-like sheet of water",
+        "a single line of stepping stones",
+        "salt-crusted stone fragments"
+      ],
+      "decay": [
+        "crusted with white salt",
+        "bleached and cracked",
+        "streaked with mineral stains"
+      ],
+      "atmosphere": [
+        "soft white haze",
+        "a mirror reflection merging sky and ground",
+        "faint mist on the water"
+      ],
+      "lighting": [
+        "pale overcast light",
+        "soft pastel twilight",
+        "flat silver light"
+      ],
+      "palette": "bone white, pale grey-blue, and soft silver",
+      "medium": "Clearly a salt flat: perfectly flat ground, thin water reflecting the sky, no vegetation"
+    },
+    {
+      "id": "volcanic",
+      "label": "Abu Vulkanik (Volcanic)",
+      "landscape": "a black volcanic ash plain",
+      "structure": [
+        "abandoned basalt fortress",
+        "colossal obsidian gate",
+        "ruined temple of black stone",
+        "giant column of cooled lava shaped like a tower",
+        "half-buried brutalist bunker",
+        "ring of basalt monoliths"
+      ],
+      "foreground": [
+        "fields of grey ash with rippled patterns",
+        "cracked black lava crust",
+        "a few charred stone fragments",
+        "a long trench in the ash"
+      ],
+      "decay": [
+        "buried in grey ash",
+        "scorched and cracked stone",
+        "streaked with sulfur stains"
+      ],
+      "atmosphere": [
+        "slowly falling ash",
+        "low smoke-like haze",
+        "layered ash clouds fading away"
+      ],
+      "lighting": [
+        "dim grey light through ash clouds",
+        "a faint distant red glow on the horizon",
+        "cold dusk light"
+      ],
+      "palette": "charcoal black, ash grey, and a hint of dull rust",
+      "medium": "Clearly a volcanic wasteland: black ash ground, ash in the air, no vegetation"
+    },
+    {
+      "id": "coast",
+      "label": "Pesisir Kabut (Foggy Coast)",
+      "landscape": "a desolate foggy coastline",
+      "structure": [
+        "abandoned lighthouse on a sea stack",
+        "collapsed sea fortress",
+        "giant stone breakwater gate",
+        "colossal statue standing in the shallow sea",
+        "derelict concrete pier stretching into fog",
+        "ruined cliffside monastery"
+      ],
+      "foreground": [
+        "wet black pebbles",
+        "flat rocks washed by calm water",
+        "the edge of a dark tidal pool",
+        "a line of old wooden posts in the water"
+      ],
+      "decay": [
+        "weathered by salt and wind",
+        "covered in dark barnacles",
+        "rusted iron fittings"
+      ],
+      "atmosphere": [
+        "dense sea fog",
+        "calm grey sea mist",
+        "layered fog banks over the water"
+      ],
+      "lighting": [
+        "flat overcast sea light",
+        "soft grey dawn",
+        "pale light breaking through fog"
+      ],
+      "palette": "slate blue, cold grey, and wet black",
+      "medium": "Clearly a cold coast: calm grey sea, wet rocks, sea fog, no boats"
+    },
+    {
+      "id": "cavern",
+      "label": "Gua Raksasa (Cavern)",
+      "landscape": "a colossal underground cavern",
+      "structure": [
+        "buried ancient city carved into the rock",
+        "giant stone staircase descending into darkness",
+        "forgotten underground temple",
+        "colossal carved face in the cavern wall",
+        "abandoned mining tower",
+        "underground lake palace"
+      ],
+      "foreground": [
+        "still black underground water",
+        "smooth wet rock",
+        "broken carved steps",
+        "a narrow rock ledge"
+      ],
+      "decay": [
+        "covered in mineral deposits",
+        "stalactites growing over its edges",
+        "damp, dripping stone"
+      ],
+      "atmosphere": [
+        "thin cave mist",
+        "dust in faint light beams",
+        "darkness fading into the depths"
+      ],
+      "lighting": [
+        "a single shaft of daylight from an opening far above",
+        "faint cold light reflected from water",
+        "a dim glow from a distant opening"
+      ],
+      "palette": "deep umber, cold grey, and faint teal",
+      "medium": "Clearly deep underground: a rock ceiling far above, damp air, no sky"
+    }
+  ],
+  "moods": [
+    {
+      "id": "solitude",
+      "label": "Ambient Solitude",
+      "desc": "Kesepian yang meditatif",
+      "weight": 4,
+      "camera": "A quiet, minimalist photograph of {L}.",
+      "feeling": "Overwhelming emptiness and loneliness; time has stopped."
+    },
+    {
+      "id": "kenopsia",
+      "label": "Kenopsia",
+      "desc": "Kemegahan yang ditinggalkan",
+      "weight": 2,
+      "camera": "A cinematic photograph of {L}.",
+      "feeling": "Abandoned grandeur, ghostly silence, slow poetic decay."
+    },
+    {
+      "id": "megalophobia",
+      "label": "Megalophobia",
+      "desc": "Skala raksasa",
+      "weight": 2,
+      "camera": "A photograph of {L} emphasizing dwarfing scale.",
+      "feeling": "Oppressive, immense scale that makes the viewer feel insignificant."
+    },
+    {
+      "id": "liminal",
+      "label": "Liminal Space",
+      "desc": "Ruang transisi hampa",
+      "weight": 2,
+      "camera": "An uncanny, perfectly still photograph of {L}.",
+      "feeling": "Uncanny stillness, endless repetition, surreal isolation."
+    }
+  ],
+  "framings": [
+    {
+      "label": "Simetris + pantulan",
+      "text": "Centered and symmetrical, head-on at eye level, 35mm; mirrored in still water or ice below, horizon at mid-frame."
+    },
+    {
+      "label": "Dibingkai reruntuhan",
+      "fg": false,
+      "text": "Seen through a large broken archway or shattered window in the dark foreground, which frames it on all sides; 28mm."
+    },
+    {
+      "label": "Dari dalam ke luar",
+      "fg": false,
+      "text": "Shot from deep inside a ruin looking out; dark collapsed walls form the frame edges, the landscape and the structure glow faintly beyond; 24mm."
+    },
+    {
+      "label": "Drone dari atas",
+      "fg": false,
+      "text": "High aerial view looking steeply down; the structure in the lower part of the frame, vast ground patterns fading into haze above; 35mm."
+    },
+    {
+      "label": "Telefoto berlapis",
+      "text": "Long telephoto, 200mm, compressing distance; the structure and fainter layers of ruins behind it stacked like paper cut-outs, each paler in the haze."
+    },
+    {
+      "label": "Low angle menjulang",
+      "text": "Extreme low angle from near its base, 16mm ultra-wide; it towers out of the top of the frame, lines converging into the haze."
+    },
+    {
+      "label": "Muncul sebagian",
+      "text": "Only part of it enters from the left edge, huge and cropped, dissolving into fog; the right two-thirds empty; 50mm."
+    },
+    {
+      "label": "Horizon tinggi",
+      "text": "High horizon near the top; textured ground fills most of the frame, the structure small but sharp near the top-left; 24mm."
+    },
+    {
+      "label": "Diagonal menjauh",
+      "text": "Its repeated forms run diagonally from the near-left corner into the far right, shrinking and fading; 28mm, slightly elevated."
+    },
+    {
+      "label": "Kecil di kiri",
+      "text": "Placed small but readable in the far left third, facing a huge empty space to the right; slightly elevated, 35mm."
+    },
+    {
+      "label": "Panorama sinematik",
+      "text": "Wide cinematic panorama, 2.39:1 feeling inside the frame, the structure on the right third, a long band of haze across the middle; 40mm anamorphic look."
+    },
+    {
+      "label": "Siluet berlatar terang",
+      "text": "Backlit: a pale bright patch of haze directly behind it turns it into a near-black silhouette with soft edges; 50mm."
+    },
+    {
+      "label": "Dari kejauhan, lapisan bukit",
+      "fg": false,
+      "text": "Seen from a ridge far away, 85mm; several receding ridges of terrain in front of it, each paler, the structure on the last visible layer."
+    },
+    {
+      "label": "Close-up detail + skala",
+      "text": "Close to one corner of the structure, 24mm, its weathered surface filling one side of the frame while the rest of it rises away into the haze, showing its immense scale."
+    },
+    {
+      "label": "Dari bawah permukaan",
+      "fg": false,
+      "text": "Viewed from a low hollow or trench, the ground edges framing the bottom of the image, the structure rising on the horizon beyond; 28mm."
+    },
+    {
+      "label": "Off-center tinggi",
+      "text": "The structure placed high in the right third, a long empty slope or plain leading up to it from the bottom-left; 35mm."
+    }
+  ],
+  "twists": [
+    "",
+    "it leans noticeably, as if slowly sinking",
+    "a wide staircase on its side ends abruptly in mid-air",
+    "a faint twin of it repeats behind, half-dissolved in haze",
+    "a wide crack splits it in two, haze flowing through the gap",
+    "a vast circular opening pierces its center",
+    "a colossal fallen statue head lies half-buried near its base",
+    "its upper part is intact while its base has crumbled away",
+    "it is half swallowed by the ground, only the upper levels visible",
+    "a long bridge leads from it to nowhere, broken off in the haze",
+    "it is impossibly tall and thin, vanishing into the sky",
+    "giant chains hang from it into the haze below",
+    "a perfectly round pool of still water lies before it",
+    "rows of identical smaller copies of it stand in the far distance",
+    "it is wrapped in vast tattered sheets of fabric moving slightly",
+    "part of it has been turned upside down and rests on its own roof"
+  ],
+  "emptiness": [
+    "endless negative space",
+    "an infinite fading horizon",
+    "layers of haze receding into nothing",
+    "a silent emptiness stretching forever",
+    "a vast, featureless plain",
+    "a horizon lost entirely in fog"
+  ],
+  "aspects": [
+    "16:9",
+    "21:9",
+    "9:16",
+    "1:1",
+    "3:2",
+    "2:3"
+  ],
+  "revisions": [
+    {
+      "label": "Terlihat miniatur",
+      "text": "Remove the miniature / tilt-shift look: use deep focus so the foreground and background are both sharp, and make the structure feel truly monumental and real-world sized."
+    },
+    {
+      "label": "Terlihat tempelan",
+      "text": "Integrate the structure into the scene: apply the same haze, light direction and color grading to it, soften its contrast with distance, and cover it with the same dust or sediment as the ground."
+    },
+    {
+      "label": "Subjek terlalu kecil",
+      "text": "Make the main structure noticeably larger and closer, about a third of the frame height, while keeping the empty space around it."
+    },
+    {
+      "label": "Subjek terlalu besar",
+      "text": "Move the camera further back so the structure becomes smaller and more distant, with more empty space and haze around it."
+    },
+    {
+      "label": "Terlalu ramai",
+      "text": "Simplify the image: remove most of the debris, branches and small objects, keep the ground calm and clean, and keep only the main structure and the atmosphere."
+    },
+    {
+      "label": "Terlalu terang",
+      "text": "Make the whole image darker and moodier: lower the exposure, deepen the shadows, and keep only a faint, soft light."
+    },
+    {
+      "label": "Terlalu gelap",
+      "text": "Lift the shadows slightly so the structure and its details are readable, while keeping the dark, quiet mood."
+    },
+    {
+      "label": "Warna terlalu kuat",
+      "text": "Desaturate the colors and lower the contrast for a muted, calm, filmic look."
+    },
+    {
+      "label": "Kabut kurang",
+      "text": "Add more layered atmospheric haze between the camera and the structure, so the background fades softly."
+    },
+    {
+      "label": "Terlalu berkabut",
+      "text": "Reduce the haze slightly so the structure's shape and weathered details are clearer, keeping a soft atmosphere."
+    },
+    {
+      "label": "Mirip bangunan terkenal",
+      "text": "Redesign the structure so it no longer resembles any real or famous landmark: give it an original, unique architecture while keeping the same style and mood."
+    },
+    {
+      "label": "Kurang nyata",
+      "text": "Make it look like a real photograph: natural light, real weathered materials, subtle film grain and lens imperfections, no painterly or CGI look."
+    },
+    {
+      "label": "Ada objek aneh",
+      "text": "Remove any people, animals, vehicles, text, doors, lights or other out-of-place objects from the scene."
+    },
+    {
+      "label": "Ruang judul kurang",
+      "text": "Keep a larger calm, empty area of sky or haze, free of details, where a title can be placed."
+    }
+  ],
+  "studio": {
+    "cfgParam": "studio.html?cfg=<base64(UTF-8 JSON)>",
+    "cfgExample": {
+      "image": "background.png",
+      "width": 1920,
+      "height": 1080,
+      "fps": 30,
+      "scale": 2,
+      "loopSeconds": 30,
+      "landscape": "frozen",
+      "overlays": {
+        "fog": {
+          "color": "#e8eff3",
+          "opacity": 0.28
+        },
+        "particles": {
+          "kind": "snow",
+          "count": 220
+        },
+        "stars": false,
+        "aurora": false,
+        "rays": false,
+        "grain": 0.05,
+        "vignette": 0.35,
+        "zoom": 0.04,
+        "breathe": 0.03
+      }
+    },
+    "particleKinds": [
+      "snow",
+      "rain",
+      "dust",
+      "sediment",
+      "stardust",
+      "sparkle"
+    ],
+    "resolutions": {
+      "1080": 1,
+      "1440": 1.3333,
+      "2160": 2
+    },
+    "upscaleModels": {
+      "max": "Real-ESRGAN x4plus (most detail, needs GPU)",
+      "fast": "Real-ESRGAN General x4v3 dn0.3 (fast)"
+    },
+    "gradingPresets": [
+      {
+        "id": "none",
+        "label": "Tanpa grading"
+      },
+      {
+        "id": "filmic",
+        "label": "Filmic lembut"
+      },
+      {
+        "id": "tealfog",
+        "label": "Teal kabut"
+      },
+      {
+        "id": "moonlight",
+        "label": "Cahaya bulan"
+      },
+      {
+        "id": "bleach",
+        "label": "Bleach bypass"
+      },
+      {
+        "id": "sepia",
+        "label": "Debu sepia"
+      },
+      {
+        "id": "coldsteel",
+        "label": "Baja dingin"
+      },
+      {
+        "id": "ember",
+        "label": "Bara redup"
+      },
+      {
+        "id": "dreamy",
+        "label": "Pastel mimpi"
+      },
+      {
+        "id": "noir",
+        "label": "Noir hitam-putih"
+      }
+    ]
+  }
+}

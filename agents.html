@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agent Guide</title>
+  <meta name="description" content="Guide for AI agents (e.g. Muse AI) to understand and operate the Dark Ambient Prompt Generator and Ambient Video Studio.">
+  <link rel="alternate" type="text/plain" href="./llms.txt" title="llms.txt">
+  <link rel="alternate" type="application/json" href="./agent/options.json" title="All options (JSON)">
+  <link rel="stylesheet" href="./css/style.css?v=16">
+  <style>
+    .doc { max-width: 860px; margin: 0 auto; padding: 0 16px 40px; }
+    .doc h2 { font: 600 1.6rem var(--serif); text-transform: none; letter-spacing: 0; color: #e1e5ea; margin: 40px 0 10px; }
+    .doc h3 { font-size: 1rem; color: var(--text); margin: 22px 0 6px; }
+    .doc p, .doc li { color: var(--text); font-size: .93rem; }
+    .doc code { font-family: var(--mono); font-size: .82rem; background: var(--panel-2); padding: 1px 5px; border-radius: 4px; }
+    .doc pre { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; overflow-x: auto; font: .8rem/1.55 var(--mono); color: #d7dce2; }
+    .doc table { width: 100%; border-collapse: collapse; font-size: .85rem; margin: 8px 0; display: block; overflow-x: auto; }
+    .doc th, .doc td { border-bottom: 1px solid var(--line); padding: 6px 8px; text-align: left; vertical-align: top; }
+    .doc th { color: var(--muted); font-weight: 500; }
+    .doc a { color: var(--accent); }
+    .callout { border-left: 3px solid var(--accent); background: var(--panel); padding: 10px 14px; border-radius: 0 8px 8px 0; margin: 12px 0; }
+    .toc { columns: 2; font-size: .88rem; } @media (max-width: 560px) { .toc { columns: 1; } }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <h1>Agent<br><span>Guide</span></h1>
+    <p><a href="./" style="color:var(--accent);text-decoration:none">← Prompt Generator</a> · <a href="./studio.html" style="color:var(--accent);text-decoration:none">Video Studio</a></p>
+  </header>
+
+  <main class="doc">
+    <div class="callout">
+      <p><b>Untuk agen AI (mis. Muse AI).</b> Halaman ini menjelaskan semua fitur aplikasi, cara membangun prompt sendiri, dan cara mengoperasikan aplikasi lewat URL.
+      UI aplikasi berbahasa Indonesia; dokumentasi teknis di bawah berbahasa Inggris agar mudah diproses agen.</p>
+      <p>Machine-readable: <a href="./llms.txt"><code>llms.txt</code></a> (summary) · <a href="./agent/options.json"><code>agent/options.json</code></a> (every option, generated from source on each deploy).</p>
+    </div>
+
+    <ol class="toc">
+      <li><a href="#purpose">Purpose</a></li>
+      <li><a href="#workflow">End-to-end workflow</a></li>
+      <li><a href="#generator">Prompt generator</a></li>
+      <li><a href="#url">URL API</a></li>
+      <li><a href="#build">Building a prompt yourself</a></li>
+      <li><a href="#title">Title → prompt</a></li>
+      <li><a href="#revise">Revision prompts</a></li>
+      <li><a href="#overlay">Overlay &amp; motion</a></li>
+      <li><a href="#studio">Video Studio</a></li>
+      <li><a href="#cli">CLI rendering</a></li>
+      <li><a href="#rules">Rules &amp; limits</a></li>
+    </ol>
+
+    <h2 id="purpose">1. Purpose</h2>
+    <p>The app creates <b>still background images and long looping videos for ambient / dark-ambient music</b> (YouTube, 16:9).
+    Aesthetic: kenopsia, megalophobia, liminal space; a lone, original, abandoned structure in a vast, quiet, hazy landscape; photorealistic; no life.</p>
+    <ul>
+      <li><b>Prompt Generator</b> (<code>./</code>): builds narrative image prompts for <b>Nano Banana</b> (Google Gemini image models).</li>
+      <li><b>Video Studio</b> (<code>./studio.html</code>): upscales the image to 4K, color-grades it, adds animated overlays, and renders an MP4 for the full audio length, entirely in the browser (Remotion web renderer).</li>
+    </ul>
+
+    <h2 id="workflow">2. End-to-end workflow</h2>
+    <ol>
+      <li>Open the generator with the audio title: <code>./?title=&lt;audio title&gt;</code> (or pick options manually).</li>
+      <li>Copy the prompt → generate in Nano Banana (Gemini). Generate 3–4 variants, keep the best.</li>
+      <li>If something is off, send a <a href="#revise">revision prompt</a> in the same Gemini chat.</li>
+      <li>Click <b>Buka Video Studio</b> (passes overlay settings via <code>?cfg=</code>).</li>
+      <li>In the Studio: choose image → <b>Upscale ke 4K</b> → pick a color grading preset → adjust overlays → choose audio → <b>Render Video</b>.</li>
+    </ol>
+    <p class="callout">Image generation and file selection need a human (or an agent with browser + file access). The generator itself needs no login and no API key.</p>
+
+    <h2 id="generator">3. Prompt generator: concepts</h2>
+    <table>
+      <tr><th>Field</th><th>Meaning</th><th>Choice</th></tr>
+      <tr><td>Landscape (<code>l</code>)</td><td>10 worlds: abyssal, desert, frozen, forest, alien, urban, saltflat, volcanic, coast, cavern. Each has its own structures, foregrounds, decay, atmosphere, lighting, palette and environment cues.</td><td>one</td></tr>
+      <tr><td>Mood (<code>m</code>)</td><td>solitude (default), kenopsia, megalophobia, liminal: sets the opening sentence and the feeling.</td><td>one</td></tr>
+      <tr><td>Structure</td><td>The lone subject (always described as an original design, never a real landmark).</td><td>one</td></tr>
+      <tr><td>Framing</td><td>16 composition + lens patterns (symmetry with reflection, framed through ruins, drone, 200mm telephoto, 16mm low angle, partial reveal…). Consecutive random picks avoid the last 4 used.</td><td>one</td></tr>
+      <tr><td>Twist</td><td>15 unexpected but believable details (leaning, staircase into mid-air, faint twin, crack, fallen statue head…) or none.</td><td>one</td></tr>
+      <tr><td>Foreground</td><td>Leading element; skipped when the framing provides its own foreground.</td><td>one</td></tr>
+      <tr><td>Decay, Atmosphere, Emptiness</td><td>Texture, air and negative space.</td><td>one or more</td></tr>
+      <tr><td>Lighting</td><td>One light condition (several would conflict).</td><td>one</td></tr>
+      <tr><td>Style (<code>st</code>)</td><td><code>photo</code> (default, photorealistic) or <code>matte</code> (matte painting).</td><td>one</td></tr>
+      <tr><td>Aspect (<code>ar</code>)</td><td>16:9 default (YouTube); 21:9, 9:16, 1:1, 3:2, 2:3.</td><td>one</td></tr>
+      <tr><td>Title space (<code>t</code>)</td><td>Asks for one calm empty area for a video title. Default on.</td><td>on/off</td></tr>
+      <tr><td>Extra (<code>x</code>)</td><td>Free sentence appended near the end.</td><td>text</td></tr>
+    </table>
+
+    <h2 id="url">4. URL API</h2>
+    <p>Every state is in the URL, so an agent can create shareable, reproducible links.</p>
+    <table>
+      <tr><th>Param</th><th>Value</th></tr>
+      <tr><td><code>title</code></td><td>Audio title. Overrides everything: the generator detects landscape, mood, details and mood sentences. Same title → same result.</td></tr>
+      <tr><td><code>l</code>, <code>m</code></td><td>landscape id, mood id</td></tr>
+      <tr><td><code>s o g c w</code></td><td>index of structure, foreground, lighting, framing, twist (0-based, see options.json)</td></tr>
+      <tr><td><code>d a e</code></td><td>dot-separated indexes of decay, atmosphere, emptiness, e.g. <code>d=0.2</code></td></tr>
+      <tr><td><code>ar t st x</code></td><td>aspect, title space (1/0), style (photo/matte), extra sentence</td></tr>
+    </table>
+    <pre>./?title=Ruang%20Hampa%20%C2%B7%20Musik%20Ambient%20Muram%20untuk%20Tidur
+./?l=frozen&amp;m=megalophobia&amp;s=3&amp;c=5&amp;w=2&amp;g=1&amp;d=0&amp;a=2&amp;e=1&amp;ar=16:9&amp;t=1&amp;st=photo
+./studio.html?cfg=&lt;base64 of UTF-8 JSON, see §9&gt;</pre>
+
+    <h2 id="build">5. Building a prompt yourself (no browser needed)</h2>
+    <p>Read <a href="./agent/options.json"><code>agent/options.json</code></a> and join these sentences in order (skip empty ones). Target length <b>1,300–1,800 characters</b>.</p>
+    <pre>1  {mood.camera}                      ({L} → landscape.landscape)
+2  Subject: a lone {structure}, {ORIGINAL}, {decay}.
+3  Unexpected detail: {twist}.         (skip if twist is "")
+4  Composition: {framing.text}
+5  Foreground: {foreground}, sparse and understated.   (skip if framing.fg === false)
+6  {landscape.medium}.
+7  Air: {atmosphere}; light: {lighting}.
+8  {GLOW}
+9  {INTEGRATE}
+10 Palette: {landscape.palette}.
+11 Generous empty space, {emptiness}.
+12 {mood.feeling}
+13 {DESERTED}
+14 {STYLES.photo.text | STYLES.matte.text}
+15 {TITLE_SPACE}                       (optional)
+16 {extra}                             (optional)
+17 16:9 landscape format.</pre>
+    <p>Multiple values in one field are joined as <code>a, b and c</code>.</p>
+
+    <h2 id="title">6. Title → prompt</h2>
+    <p>Keyword rules (English + Indonesian) map an audio title to settings. Multi-word phrases are matched first (“deep space” is not “deep” + “space”).</p>
+    <table>
+      <tr><th>Group</th><th>Examples → effect</th></tr>
+      <tr><td>Landscape words</td><td>ocean/laut → abyssal · sand/gurun → desert · snow/salju → frozen · fog/hutan → forest · planet/bintang → alien · city/lorong → urban · salt/cermin → saltflat · ash/lava → volcanic · lighthouse/pantai → coast · cave/gua → cavern</td></tr>
+      <tr><td>Space imagery</td><td>aurora, nebula, starlight, galaxy, orbit, celestial sea → a sky sentence over any landscape; deep space / void / event horizon / far side of the moon → alien landscape</td></tr>
+      <tr><td>Modes (Lydian…Phrygian)</td><td>weightless/melayang → bright · serene/tenang → calm · wistful/sendu → kenopsia, warm tint · dark/muram → dark · mysterious/misterius → megalophobia, dark</td></tr>
+      <tr><td>Brightness</td><td>shimmering/berkilau → brighter · deep/dim/pekat → darker (a light sentence is added when clearly bright/dark)</td></tr>
+      <tr><td>Melody</td><td>glass bells → glints of light · kalimba → droplets of light · piano → intimate stillness · drones → unbroken fog</td></tr>
+      <tr><td>Purpose</td><td>sleep/tidur → darker, solitude · focus/fokus → orderly · study/belajar → steady · meditation/meditasi → still reflection</td></tr>
+      <tr><td>Shape &amp; chapters</td><td>slowly unfolding, arrival, drift, afterglow, nightfall, horizon… → matching sentences</td></tr>
+      <tr><td>Banned</td><td>432, 528, Hz, binaural, healing, theta, solfeggio, no ads, cure, miracle, dna… are ignored</td></tr>
+    </table>
+    <p>Up to 4 mood sentences (+1 light sentence) go into the extra field. The title text itself is never put in the image prompt (so the image contains no text).</p>
+
+    <h2 id="revise">7. Revision prompts</h2>
+    <p>Follow-up messages for the same Gemini chat, to fix an image without regenerating. Format:</p>
+    <pre>Edit this image. Keep the composition, subject, style and mood the same, and only change the following: {fix 1} {fix 2} …</pre>
+    <p>Fixes available (see <code>revisions</code> in options.json): miniature look, pasted-in look, subject too small / too large, too cluttered, too bright / too dark, colors too strong, more / less haze, looks like a famous landmark, not realistic enough, odd objects, more title space.</p>
+
+    <h2 id="overlay">8. Overlay &amp; motion</h2>
+    <p>The generator proposes overlays per landscape (fog color/opacity, particle kind, stars, aurora, god rays, grain, vignette, slow zoom, light “breathing”), adjusted by the extra sentences (rain, snow, stars, aurora, dark).
+    It also gives two separate Nano Banana prompts for overlay assets on pure black (fog; particles) for use in other editors with <b>Screen</b> blending. Nano Banana makes one image per prompt, so they are separate.</p>
+
+    <h2 id="studio">9. Video Studio</h2>
+    <ol>
+      <li><b>Image</b>: PNG/JPG/WEBP.</li>
+      <li><b>Upscale ke 4K</b>: Real-ESRGAN in the browser (ONNX Runtime Web; WebGPU, CPU fallback).
+        <code>max</code> = x4plus (most detail, 67 MB, needs a GPU); <code>fast</code> = General x4v3 dn0.3 (5 MB). Always re-runs from the original image. Output 3840×2160.</li>
+      <li><b>Color grading</b>: 10 presets (default chosen by landscape) + intensity + manual exposure, contrast, saturation, temperature, tint, fade, split toning. Applied to the image pixels once; preview = render.</li>
+      <li><b>Overlay</b>: fog, particles (snow, rain, dust, sediment, stardust, sparkle), stars, aurora, god rays, grain, vignette, zoom, breathe. All motion is periodic so the loop is seamless.</li>
+      <li><b>Resolution</b>: 1080p, 1440p, 4K (default). <b>Loop length</b>: 10–60 s (default 30).</li>
+      <li><b>Render</b>: renders only the loop, then repeats it for the full audio length without re-encoding and adds the audio (MP3/M4A copied; WAV/FLAC → AAC 256/192 kbps). Writes straight to disk via the save dialog.</li>
+    </ol>
+    <p><code>cfg</code> JSON (base64 of UTF-8 in <code>studio.html?cfg=</code>):</p>
+    <pre>{ "width": 1920, "height": 1080, "fps": 30, "scale": 2, "loopSeconds": 30, "landscape": "frozen",
+  "overlays": { "fog": { "color": "#e8eff3", "opacity": 0.28 }, "particles": { "kind": "snow", "count": 220 },
+                "stars": false, "aurora": false, "rays": false,
+                "grain": 0.05, "vignette": 0.35, "zoom": 0.04, "breathe": 0.03 } }</pre>
+    <p>Requirements: Chrome or Edge on desktop (WebCodecs, File System Access). Everything runs locally; nothing is uploaded.</p>
+
+    <h2 id="cli">10. CLI rendering (optional)</h2>
+    <pre>cd video &amp;&amp; npm install
+# put image, video-config.json and audio in video/input/
+npm run make</pre>
+
+    <h2 id="rules">11. Rules &amp; limits</h2>
+    <ul>
+      <li><b>Nano Banana prompt length</b>: no official character limit; input is limited in tokens (65,536 for Nano Banana Pro). Long prompts reduce adherence, so keep prompts around 1,300–1,800 characters. The generator warns above 2,000.</li>
+      <li>No negative-prompt field in Nano Banana: exclusions are written as sentences (<code>DESERTED</code>).</li>
+      <li>Never depict real or famous landmarks, people, animals, vehicles, lights, text or watermarks.</li>
+      <li>Keep the subject readable (about a third of the frame by default) with true monumental scale; avoid miniature/tilt-shift looks.</li>
+      <li>Remotion is free only for individuals and companies of up to 3 employees; others need a license (remotion.dev/license).</li>
+      <li>Real-ESRGAN models: BSD-3-Clause (see <code>models/README.md</code>).</li>
+    </ul>
+  </main>
+  <footer>Agent guide · Static app · GitHub Pages</footer>
+</body>
+</html>

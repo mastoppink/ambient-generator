@@ -29,6 +29,8 @@ jobs:
         run: |
           npm ci
           npm run build:web
+      - name: Export options for AI agents
+        run: node scripts/export-agent-data.mjs
       - name: Remove build-only files from the site
         run: rm -rf video/node_modules
       - uses: actions/configure-pages@v5
