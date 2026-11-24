@@ -1,10 +1,12 @@
-export const TEMPLATE =
-  "{COMPOSITION}, {DISTANCE}, a lone {STRUCTURE} barely visible far away in {LANDSCAPE}, {SCALE_MOOD}, {DECAY}, veiled by {ATMOSPHERE}, under {LIGHTING}, {PALETTE}, {EMPTINESS}, vast empty space occupying most of the frame, low flat horizon, profound solitude, eternal stillness, quiet desolation, meditative atmosphere, kenopsia, devoid of life, low contrast, desaturated, soft diffused light, minimalist composition, ambient album cover, cinematic matte painting";
+export const TITLE_SPACE =
+  "Leave the upper half of the frame as calm, empty space so a title can be placed there later.";
 
-export const TITLE_SPACE = "large calm empty area in the upper half for title text";
+/** Semantic "negative": Nano Banana has no negative-prompt field, so exclusions are described positively. */
+export const DESERTED =
+  "The scene is completely deserted and silent: no people, no animals, no birds, no vehicles, no footprints, no glowing lights or windows, no text or watermark.";
 
-export const NEGATIVE =
-  "people, silhouettes of people, animals, birds, vehicles, footprints, lights, glowing windows, lens flare, bright sunlight, dramatic lighting, high contrast, vibrant colors, saturated, close-up, foreground clutter, busy composition, intricate details in foreground, text, watermark, cheerful, cartoon, low quality";
+export const STYLE =
+  "Render it as a cinematic, atmospheric matte painting with soft diffused light, low contrast and desaturated tones, minimal detail in the foreground, and a quiet, meditative feeling, suitable as a still background for a long ambient music video.";
 
 export const DISTANCES = [
   "seen from miles away",
@@ -15,9 +17,9 @@ export const DISTANCES = [
 
 export const EMPTINESS = [
   "endless negative space",
-  "infinite fading horizon",
+  "an infinite fading horizon",
   "layers of atmospheric haze receding into nothing",
-  "silent emptiness stretching forever",
+  "a silent emptiness stretching forever",
 ];
 
 export const LANDSCAPES = [
@@ -77,26 +79,20 @@ export const LANDSCAPES = [
   },
 ];
 
+// {L} is replaced by the landscape phrase.
 export const MOODS = [
   { id: "solitude", label: "Ambient Solitude", desc: "Kesepian yang meditatif", weight: 4,
-    composition: "ultra wide minimalist landscape shot, tiny subject on a low horizon",
-    scaleMood: "overwhelming emptiness, profound loneliness, time has stopped, contemplative silence" },
+    camera: "An ultra-wide, minimalist landscape view of {L}, with a very low horizon line.",
+    feeling: "It feels overwhelmingly empty and lonely, as if time has stopped, and a contemplative silence hangs over everything." },
   { id: "kenopsia", label: "Kenopsia", desc: "Kemegahan yang ditinggalkan", weight: 2,
-    composition: "ultra wide distant establishing shot, subject small in lower third",
-    scaleMood: "abandoned grandeur, ghostly silence, poetic decay, forsaken monument" },
+    camera: "A distant, ultra-wide establishing shot of {L}, with the main subject placed small in the lower third.",
+    feeling: "It carries an abandoned grandeur and a ghostly silence, a forsaken monument in slow, poetic decay." },
   { id: "megalophobia", label: "Megalophobia", desc: "Skala raksasa", weight: 2,
-    composition: "extreme long shot from far below the horizon, colossal yet distant silhouette",
-    scaleMood: "dwarfing perspective, towering oppressive scale, immense emptiness" },
+    camera: "An extreme long shot of {L} from a low vantage point very far away, so that something colossal still looks small.",
+    feeling: "Its scale is oppressive and dwarfing, an immense emptiness that makes the viewer feel insignificant." },
   { id: "liminal", label: "Liminal Space", desc: "Ruang transisi hampa", weight: 2,
-    composition: "symmetrical one-point perspective receding into infinite distance",
-    scaleMood: "uncanny stillness, endless repeating architecture, surreal isolation" },
-];
-
-export const FORMATS = [
-  { id: "plain", label: "Plain" },
-  { id: "midjourney", label: "Midjourney" },
-  { id: "sd", label: "Stable Diffusion" },
-  { id: "flux", label: "Flux" },
+    camera: "A perfectly symmetrical one-point perspective view of {L}, receding into infinite distance.",
+    feeling: "It has an uncanny stillness, endless repeating architecture and a surreal sense of isolation." },
 ];
 
 export const ASPECTS = ["16:9", "21:9", "9:16", "1:1", "3:2", "2:3"];

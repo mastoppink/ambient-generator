@@ -1,4 +1,4 @@
-import { TEMPLATE, NEGATIVE, TITLE_SPACE, LANDSCAPES, MOODS, DISTANCES, EMPTINESS } from "./data.js?v=3";
+import { TITLE_SPACE, DESERTED, STYLE, LANDSCAPES, MOODS, DISTANCES, EMPTINESS } from "./data.js?v=4";
 
 /** Per-landscape fields */
 export const FIELDS = ["structure", "decay", "atmosphere", "lighting"];
@@ -19,52 +19,42 @@ export function defaultSelection() {
   return Object.fromEntries(ALL_FIELDS.map((f) => [f, [0]]));
 }
 
-export function buildPositive(state) {
+const ASPECT_TEXT = {
+  "16:9": "a wide 16:9 landscape format", "21:9": "an ultra-wide 21:9 cinematic format",
+  "9:16": "a tall 9:16 vertical format", "1:1": "a square 1:1 format",
+  "3:2": "a 3:2 landscape format", "2:3": "a 2:3 portrait format",
+};
+const listJoin = (a) => a.length < 2 ? (a[0] || "") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1];
+const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
+/** Builds a narrative prompt for Nano Banana (Gemini image). */
+export function buildPrompt(state) {
   const l = getLandscape(state.landscape);
   const m = getMood(state.mood);
   const val = (f) => {
     if (state.custom?.[f]?.trim()) return state.custom[f].trim();
     const opts = optionsFor(l, f);
     const items = (state.sel[f] || []).map((i) => opts[i]).filter(Boolean);
-    return f === "structure" ? join(items, " and ") : join(items);
+    return listJoin(items);
   };
-  const map = {
-    COMPOSITION: m.composition,
-    DISTANCE: val("distance"),
-    STRUCTURE: val("structure") || l.structure[0],
-    LANDSCAPE: state.custom?.landscape?.trim() || l.landscape,
-    SCALE_MOOD: m.scaleMood,
-    DECAY: val("decay"),
-    ATMOSPHERE: val("atmosphere"),
-    LIGHTING: val("lighting"),
-    PALETTE: state.custom?.palette?.trim() || l.palette,
-    EMPTINESS: val("emptiness"),
-  };
-  let out = TEMPLATE.replace(/\{(\w+)\}/g, (_, k) => map[k] ?? "");
-  out = out
-    .replace(/(veiled by|under)\s*,/g, ",")
-    .replace(/\s*,\s*(,\s*)+/g, ", ")
-    .replace(/\s{2,}/g, " ")
-    .replace(/^,\s*/, "")
-    .trim();
-  if (state.titleSpace) out += ", " + TITLE_SPACE;
-  if (state.extra?.trim()) out += ", " + state.extra.trim();
-  return out;
-}
-
-export function buildOutput(state) {
-  const positive = buildPositive(state);
-  const negative = state.negative ? NEGATIVE : "";
-  if (state.format === "midjourney") {
-    let p = `${positive} --ar ${state.aspect} --style raw --stylize 50`;
-    if (negative) p += ` --no ${negative}`;
-    return { positive: p, negative: "" };
-  }
-  if (state.format === "flux") {
-    const sentence = `A ${state.aspect} image: ${positive}.`.replace(/: (\w)/, (_, c) => ": " + c.toUpperCase());
-    return { positive: sentence, negative: "" };
-  }
-  return { positive, negative };
+  const landscape = state.custom?.landscape?.trim() || l.landscape;
+  const palette = state.custom?.palette?.trim() || l.palette;
+  const sentences = [
+    m.camera.replace("{L}", landscape),
+    `Far in the distance stands a lone ${val("structure") || l.structure[0]}, ${val("distance")}.`,
+    val("decay") && `It is worn by time: ${val("decay")}.`,
+    val("atmosphere") && `The air is filled with ${val("atmosphere")}.`,
+    val("lighting") && `The only light is ${val("lighting")}.`,
+    `The color palette is restrained: ${palette}.`,
+    val("emptiness") && `The composition is dominated by ${val("emptiness")}, with empty space filling most of the frame.`,
+    m.feeling,
+    DESERTED,
+    STYLE,
+    state.titleSpace && TITLE_SPACE,
+    state.extra?.trim() && cap(state.extra.trim().replace(/\.?$/, ".")),
+    `Use ${ASPECT_TEXT[state.aspect] || state.aspect}.`,
+  ];
+  return sentences.filter(Boolean).join(" ").replace(/\s{2,}/g, " ").replace(/,\s*,/g, ",").trim();
 }
 
 function weightedMood() {
@@ -93,9 +83,7 @@ export function serialize(state) {
   p.set("l", state.landscape);
   p.set("m", state.mood);
   for (const f of ALL_FIELDS) p.set(KEYS[f], (state.sel[f] || []).join("."));
-  p.set("f", state.format);
   p.set("ar", state.aspect);
-  p.set("n", state.negative ? "1" : "0");
   p.set("t", state.titleSpace ? "1" : "0");
   return p.toString();
 }
@@ -116,9 +104,7 @@ export function parse(search, base) {
     landscape: l.id,
     mood: getMood(p.get("m")).id,
     sel,
-    format: p.get("f") || base.format,
     aspect: p.get("ar") || base.aspect,
-    negative: p.get("n") !== "0",
     titleSpace: p.get("t") !== "0",
   };
 }

@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@400;500&family=JetBrains+Mono&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./css/style.css?v=3">
+  <link rel="stylesheet" href="./css/style.css?v=4">
 </head>
 <body>
   <header class="hero">
@@ -28,31 +28,24 @@
       <div id="fields"></div>
 
       <h2><span class="num">04</span> Tambahan</h2>
-      <input id="extra" class="custom" placeholder="Kata kunci tambahan, mis. 8k, volumetric lighting">
+      <input id="extra" class="custom" placeholder="Kalimat tambahan, mis. a thin crescent moon hangs low in the sky">
     </section>
 
     <section class="output">
       <div class="panel">
         <div class="toolbar">
-          <label>Format <select id="format"></select></label>
-          <label id="aspect-wrap">Aspect <select id="aspect"></select></label>
-          <label class="toggle"><input type="checkbox" id="negative"> Negative prompt</label>
+          <span class="badge">Nano Banana</span>
+          <label>Aspect <select id="aspect"></select></label>
           <label class="toggle"><input type="checkbox" id="title-space"> Ruang untuk judul</label>
         </div>
 
         <div class="out-head"><span>Prompt</span><small id="char-count"></small></div>
-        <textarea id="out-positive" readonly rows="9"></textarea>
+        <textarea id="out-positive" readonly rows="12"></textarea>
         <div class="actions">
           <button id="copy-positive" class="primary" type="button">Salin Prompt</button>
           <button id="randomize" type="button">🎲 Acak</button>
           <button id="copy-link" type="button">Salin Link</button>
           <button id="reset" type="button" class="ghost">Reset</button>
-        </div>
-
-        <div id="neg-block">
-          <div class="out-head"><span>Negative Prompt</span></div>
-          <textarea id="out-negative" readonly rows="3"></textarea>
-          <div class="actions"><button id="copy-negative" type="button">Salin Negative</button></div>
         </div>
       </div>
 
@@ -64,6 +57,6 @@
   </main>
 
   <footer>Static app · GitHub Pages</footer>
-  <script type="module" src="./js/app.js?v=3"></script>
+  <script type="module" src="./js/app.js?v=4"></script>
 </body>
 </html>

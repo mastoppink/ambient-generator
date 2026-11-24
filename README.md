@@ -3,12 +3,11 @@
 Web statis untuk merakit prompt gambar bertema **kenopsia, megalophobia, liminal space, dan dark ambient** dari master template.
 
 ## Fitur
+- Prompt khusus **Nano Banana** (Gemini image): kalimat naratif, bukan daftar kata kunci; larangan ditulis sebagai deskripsi (tanpa negative prompt); aspect ratio disebut dalam teks
 - Dioptimalkan untuk latar musik ambient: subjek kecil dan jauh, ruang kosong dominan, cahaya redup, kontras rendah
-- 6 landscape (Abyssal, Desert, Frozen, Forest, Alien, Urban Liminal) dengan thumbnail
-- 4 nuansa: Ambient Solitude (default), Kenopsia, Megalophobia, Liminal Space
+- 6 landscape dengan thumbnail dan 4 nuansa: Ambient Solitude (default), Kenopsia, Megalophobia, Liminal Space
 - Pilih detail (structure, decay, atmosphere, lighting, distance, emptiness) atau tulis nilai custom sendiri
-- Toggle "Ruang untuk judul" untuk menyisakan area kosong bagi teks judul lagu
-- Format output: Plain, Midjourney (`--ar 16:9 --style raw --stylize 50 --no`), Stable Diffusion (positive/negative) dan Flux (kalimat natural)
+- Toggle "Ruang untuk judul", kalimat tambahan bebas
 - Tombol acak, salin, link share (state tersimpan di URL) dan riwayat (localStorage)
 
 ## Jalankan lokal

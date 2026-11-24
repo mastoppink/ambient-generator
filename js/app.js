@@ -1,7 +1,7 @@
-import { LANDSCAPES, MOODS, FORMATS, ASPECTS } from "./data.js?v=3";
+import { LANDSCAPES, MOODS, ASPECTS } from "./data.js?v=4";
 import {
-  ALL_FIELDS, SINGLE, optionsFor, getLandscape, defaultSelection, buildOutput, randomState, serialize, parse,
-} from "./generator.js?v=3";
+  ALL_FIELDS, SINGLE, optionsFor, getLandscape, defaultSelection, buildPrompt, randomState, serialize, parse,
+} from "./generator.js?v=4";
 
 const $ = (s) => document.querySelector(s);
 const FIELD_LABELS = {
@@ -11,7 +11,7 @@ const HISTORY_KEY = "dap-history";
 
 const base = {
   landscape: LANDSCAPES[0].id, mood: MOODS[0].id, sel: defaultSelection(),
-  format: "plain", aspect: "16:9", negative: true, titleSpace: true, custom: {}, extra: "",
+  aspect: "16:9", titleSpace: true, custom: {}, extra: "",
 };
 let state = parse(location.search, base) || { ...base };
 
@@ -55,20 +55,15 @@ function renderFields() {
 }
 
 function renderOptions() {
-  $("#format").innerHTML = FORMATS.map((f) => `<option value="${f.id}" ${f.id === state.format ? "selected" : ""}>${f.label}</option>`).join("");
   $("#aspect").innerHTML = ASPECTS.map((a) => `<option ${a === state.aspect ? "selected" : ""}>${a}</option>`).join("");
-  $("#aspect-wrap").hidden = state.format !== "midjourney";
-  $("#negative").checked = state.negative;
   $("#title-space").checked = state.titleSpace;
   $("#extra").value = state.extra;
 }
 
 function renderOutput() {
-  const { positive, negative } = buildOutput(state);
+  const positive = buildPrompt(state);
   $("#out-positive").value = positive;
-  $("#out-negative").value = negative;
-  $("#neg-block").hidden = !negative;
-  $("#char-count").textContent = `${positive.length} karakter`;
+  $("#char-count").textContent = `${positive.split(/\s+/).length} kata`;
   history.replaceState(null, "", "?" + serialize(state));
 }
 
@@ -122,15 +117,12 @@ $("#fields").addEventListener("input", (e) => {
   const k = e.target.dataset.custom; if (!k) return;
   state.custom[k] = e.target.value; renderOutput();
 });
-$("#format").addEventListener("change", (e) => { state.format = e.target.value; renderOptions(); renderOutput(); });
 $("#aspect").addEventListener("change", (e) => { state.aspect = e.target.value; renderOutput(); });
-$("#negative").addEventListener("change", (e) => { state.negative = e.target.checked; renderOutput(); });
 $("#title-space").addEventListener("change", (e) => { state.titleSpace = e.target.checked; renderOutput(); });
 $("#extra").addEventListener("input", (e) => { state.extra = e.target.value; renderOutput(); });
 $("#randomize").addEventListener("click", () => { state = randomState(state); renderAll(); });
 $("#reset").addEventListener("click", () => { state = { ...base, sel: defaultSelection(), custom: {} }; renderAll(); });
 $("#copy-positive").addEventListener("click", (e) => { const t = $("#out-positive").value; copy(t, e.target); pushHistory(t); });
-$("#copy-negative").addEventListener("click", (e) => copy($("#out-negative").value, e.target));
 $("#copy-link").addEventListener("click", (e) => copy(location.href, e.target));
 $("#history").addEventListener("click", (e) => {
   const b = e.target.closest(".hist"); if (b) copy(b.textContent, b);
