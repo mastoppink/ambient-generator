@@ -7,6 +7,14 @@ import { defaultProps } from "../src/Root.jsx";
 import { muxLoopWithAudio, audioDuration } from "./mux.js";
 import { PRESETS, DEFAULT_GRADE, presetFor, applyGrade } from "./grade.js";
 
+// Video bitrate (bits/s) per resolution and quality. "high" matches YouTube's upload recommendation.
+const QUALITIES = {
+  high: { label: "Tinggi (rekomendasi upload YouTube)", bps: { 1080: 12e6, 1440: 24e6, 2160: 40e6 } },
+  balanced: { label: "Seimbang (disarankan)", bps: { 1080: 6e6, 1440: 10e6, 2160: 16e6 } },
+  small: { label: "Hemat (file kecil)", bps: { 1080: 3e6, 1440: 5e6, 2160: 8e6 } },
+};
+const fmtSize = (bytes) => (bytes > 1e9 ? (bytes / 1e9).toFixed(1) + " GB" : Math.round(bytes / 1e6) + " MB");
+
 const RESOLUTIONS = { "1080": { label: "1080p (Full HD)", scale: 1 }, "1440": { label: "1440p (2K)", scale: 4 / 3 }, "2160": { label: "2160p (4K)", scale: 2 } };
 
 const KINDS = ["snow", "rain", "dust", "sediment", "stardust", "sparkle"];
@@ -33,6 +41,7 @@ function App() {
   const [origFile, setOrigFile] = useState(null);
   const [imageSize, setImageSize] = useState(null);
   const [up, setUp] = useState({ stage: "idle" });
+  const [quality, setQuality] = useState("balanced");
   const [upModel, setUpModel] = useState(() => ("gpu" in navigator ? "max" : "fast"));
   const [resolution, setResolution] = useState(() => (initialConfig().scale === 1 ? "1080" : "2160"));
   const [audio, setAudio] = useState(null);
@@ -132,7 +141,7 @@ function App() {
       const renderProps = { ...inputProps, image: renderImageUrl, renderScale: scale };
       const { getBlob } = await renderMediaOnWeb({
         composition, inputProps: renderProps, container: "mp4", videoCodec, muted: true, scale,
-        videoBitrate: "very-high", keyframeIntervalInSeconds: 2,
+        videoBitrate: QUALITIES[quality].bps[resolution], keyframeIntervalInSeconds: 4,
         licenseKey: "free-license", signal: ctrl.signal,
         onProgress: (p) => setStatus({ stage: "render", progress: p.progress }),
       });
@@ -245,6 +254,10 @@ function App() {
         <label className="row" style={{ marginBottom: 12 }}><span>Resolusi video</span>
           <select value={resolution} onChange={(e) => setResolution(e.target.value)}>
             {Object.entries(RESOLUTIONS).map(([k, r]) => <option key={k} value={k}>{r.label}</option>)}
+          </select></label>
+        <label className="row" style={{ marginBottom: 12 }}><span>Kualitas file {audioLen > 0 && <b>· perkiraan {fmtSize((QUALITIES[quality].bps[resolution] + 320e3) * audioLen / 8)}</b>}</span>
+          <select value={quality} onChange={(e) => setQuality(e.target.value)}>
+            {Object.entries(QUALITIES).map(([k, q]) => <option key={k} value={k}>{q.label} · {Math.round(q.bps[resolution] / 1e6)} Mbps</option>)}
           </select></label>
         <Range label="Panjang loop (detik)" v={cfg.loopSeconds} min={10} max={60} step={5} fmt={(v) => v + " d"} onChange={(v) => setCfg((c) => ({ ...c, loopSeconds: v }))} />
       </section>
