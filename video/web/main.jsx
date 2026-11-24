@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Player } from "@remotion/player";
 import { renderMediaOnWeb, canRenderMediaOnWeb, getEncodableVideoCodecs } from "@remotion/web-renderer";
-import { AmbientFull, segmentFrames } from "../src/Full.jsx";
+import { AmbientFull, segmentFrames, FONT_PAIRS } from "../src/Full.jsx";
 import { defaultProps } from "../src/Root.jsx";
 import { muxLoopWithAudio, audioDuration } from "./mux.js";
 import { PRESETS, DEFAULT_GRADE, presetFor, applyGrade } from "./grade.js";
@@ -32,6 +32,7 @@ function initialConfig() {
     ...c,
     loopSeconds: Math.max(10, Math.round(c.loopSeconds / 2) * 2),
     intro: { enabled: true, seconds: 8, title: t || "Ambient", subtitle: rest.join(" · "), channel: "The Quiet Ruins", ...c.intro },
+    fontPair: c.fontPair || "classic",
     cta: { enabled: true, text: "If this stillness keeps you company,", button: "Subscribe for more", start: 2, hold: 8, firstMin: 1, everyMin: 10, ...c.cta },
   };
 }
@@ -159,6 +160,11 @@ function App() {
       step = "membaca file gambar";
       const imageData = gradedBlobRef.current || new Blob([await imageFile.arrayBuffer()], { type: imageFile.type });
 
+      step = "memuat font";
+      const pair = FONT_PAIRS[cfg.fontPair] || FONT_PAIRS.classic;
+      const fam = pair.serif.replace(/'/g, "");
+      await Promise.all([`${pair.weight} 40px "${fam}"`, `italic ${pair.weight} 40px "${fam}"`, '400 20px "Jost"', '500 20px "Jost"'].map((f) => document.fonts.load(f)));
+
       step = "render loop";
       // A dedicated URL that stays valid for the whole render, whatever happens to the preview.
       const renderImageUrl = URL.createObjectURL(imageData);
@@ -271,6 +277,10 @@ function App() {
         </details>
 
         <h2><span className="num">03</span> Intro &amp; CTA</h2>
+        <label className="row" style={{ marginBottom: 10 }}><span>Tipografi</span>
+          <select value={cfg.fontPair} onChange={(e) => setCfg((c) => ({ ...c, fontPair: e.target.value }))}>
+            {Object.entries(FONT_PAIRS).map(([k, f]) => <option key={k} value={k}>{f.label}</option>)}
+          </select></label>
         <label className="toggle"><input type="checkbox" checked={cfg.intro.enabled} onChange={(e) => setIntro({ enabled: e.target.checked })} /> Intro (judul di awal video)</label>
         {cfg.intro.enabled && (
           <div className="grid2" style={{ margin: "10px 0 16px" }}>

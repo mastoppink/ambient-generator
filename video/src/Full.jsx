@@ -18,6 +18,8 @@ export const segmentFrames = ({ fps, loopSeconds, intro, cta }) => {
 };
 
 export const AmbientFull = (props) => {
+  const pair = FONT_PAIRS[props.fontPair] || FONT_PAIRS.classic;
+  SERIF = pair.serif + FALLBACK_SERIF; SERIF_W = pair.weight; SIZE = pair.size;
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const { I, L } = segmentFrames({ fps, ...props });
@@ -40,8 +42,15 @@ export const AmbientFull = (props) => {
   );
 };
 
-const SERIF = "'Cormorant Garamond', 'Cormorant', Georgia, 'Times New Roman', serif";
-const SANS = "Inter, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif";
+/** Font pairings (self-hosted in /fonts): an editorial serif for titles + a geometric European sans for small caps. */
+export const FONT_PAIRS = {
+  classic: { label: "Classic · Cormorant Garamond + Jost", serif: "'Cormorant Garamond'", weight: 300, size: 1 },
+  bookish: { label: "Bookish · EB Garamond + Jost", serif: "'EB Garamond'", weight: 400, size: 0.9 },
+  couture: { label: "Couture · Bodoni Moda + Jost", serif: "'Bodoni Moda'", weight: 400, size: 0.82 },
+};
+const FALLBACK_SERIF = ", Georgia, 'Times New Roman', serif";
+const SANS = "Jost, 'Futura', 'Century Gothic', 'Helvetica Neue', Arial, sans-serif";
+let SERIF = FONT_PAIRS.classic.serif + FALLBACK_SERIF, SERIF_W = 300, SIZE = 1;
 
 const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" };
 const ease = (t) => 1 - Math.pow(1 - t, 3);
@@ -87,9 +96,9 @@ const Intro = ({ frame, total, fps, title = "", subtitle = "", channel = "" }) =
           </div>
         )}
         <Letters text={title.toUpperCase()} s={s} start={1.2} step={step}
-          style={{ fontFamily: SERIF, fontSize: 100, fontWeight: 300, letterSpacing: tracking, lineHeight: 1.05, marginRight: -tracking }} />
+          style={{ fontFamily: SERIF, fontSize: Math.round(100 * SIZE), fontWeight: SERIF_W, letterSpacing: tracking, lineHeight: 1.05, marginRight: -tracking }} />
         {subtitle && <div style={{ width: 180, height: 1, background: `linear-gradient(90deg, transparent, ${ivory}aa, transparent)`, margin: "40px 0 30px", transform: `scaleX(${rule})` }} />}
-        {subtitle && <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: 40, fontWeight: 300, letterSpacing: 1.5, opacity: 0.88 * sub, transform: `translateY(${(1 - sub) * 6}px)` }}>{subtitle}</div>}
+        {subtitle && <div style={{ fontFamily: SERIF, fontStyle: "italic", fontSize: Math.round(40 * SIZE), fontWeight: SERIF_W, letterSpacing: 1.5, opacity: 0.88 * sub, transform: `translateY(${(1 - sub) * 6}px)` }}>{subtitle}</div>}
       </AbsoluteFill>
       <AbsoluteFill style={{ backgroundColor: "black", opacity: black }} />
     </AbsoluteFill>
@@ -106,7 +115,7 @@ const Cta = ({ frame, total, fps, text = "", button = "Subscribe", start = 2, ho
   return (
     <AbsoluteFill style={{ justifyContent: "flex-end", alignItems: "flex-start", padding: "0 0 112px 124px", opacity: o * 0.92 }}>
       <div style={{ color: ivory, textShadow: "0 0 28px rgba(0,0,0,0.6)", transform: `translateY(${(1 - o) * 8}px)` }}>
-        {text && <div style={{ fontFamily: SERIF, fontStyle: "italic", fontWeight: 300, fontSize: 40, letterSpacing: 0.4, marginBottom: 18 }}>{text}</div>}
+        {text && <div style={{ fontFamily: SERIF, fontStyle: "italic", fontWeight: SERIF_W, fontSize: Math.round(40 * SIZE), letterSpacing: 0.4, marginBottom: 18 }}>{text}</div>}
         <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
           <div style={{ width: 70, height: 1, background: ivory, opacity: 0.55, transform: `scaleX(${lineIn})`, transformOrigin: "left" }} />
           <div style={{ fontFamily: SANS, fontSize: 19, fontWeight: 500, letterSpacing: 8, textTransform: "uppercase", opacity: btn, transform: `translateX(${(1 - btn) * -8}px)` }}>{button}</div>
