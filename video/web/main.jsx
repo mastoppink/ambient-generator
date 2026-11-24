@@ -31,7 +31,7 @@ function initialConfig() {
   return {
     ...c,
     loopSeconds: Math.max(10, Math.round(c.loopSeconds / 2) * 2),
-    intro: { enabled: true, seconds: 8, title: t || "Ambient", subtitle: rest.join(" · "), channel: "", ...c.intro },
+    intro: { enabled: true, seconds: 8, title: t || "Ambient", subtitle: rest.join(" · "), channel: "The Quiet Ruins", ...c.intro },
     cta: { enabled: true, text: "If this stillness keeps you company,", button: "Subscribe for more", start: 2, hold: 8, firstMin: 1, everyMin: 10, ...c.cta },
   };
 }
