@@ -42,7 +42,7 @@ h2:first-child { margin-top: 0; }
 .card:hover .card-swatch img, .card.active .card-swatch img { opacity: 1; transform: scale(1.04); }
 .card-label { display: block; padding: 10px 12px; font-size: .85rem; }
 
-.moods { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.moods { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 @media (max-width: 520px) { .moods { grid-template-columns: 1fr; } }
 .mood {
   text-align: left; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); cursor: pointer;

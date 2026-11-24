@@ -1,17 +1,17 @@
-import { LANDSCAPES, MOODS, FORMATS, ASPECTS } from "./data.js?v=2";
+import { LANDSCAPES, MOODS, FORMATS, ASPECTS } from "./data.js?v=3";
 import {
-  FIELDS, getLandscape, defaultSelection, buildOutput, randomState, serialize, parse,
-} from "./generator.js?v=2";
+  ALL_FIELDS, SINGLE, optionsFor, getLandscape, defaultSelection, buildOutput, randomState, serialize, parse,
+} from "./generator.js?v=3";
 
 const $ = (s) => document.querySelector(s);
 const FIELD_LABELS = {
-  structure: "Structure", decay: "Decay & Texture", atmosphere: "Atmosphere & Haze", lighting: "Lighting",
+  distance: "Distance", structure: "Structure", decay: "Decay & Texture", atmosphere: "Atmosphere & Haze", lighting: "Lighting", emptiness: "Emptiness",
 };
 const HISTORY_KEY = "dap-history";
 
 const base = {
   landscape: LANDSCAPES[0].id, mood: MOODS[0].id, sel: defaultSelection(),
-  format: "plain", aspect: "21:9", negative: true, custom: {}, extra: "",
+  format: "plain", aspect: "16:9", negative: true, titleSpace: true, custom: {}, extra: "",
 };
 let state = parse(location.search, base) || { ...base };
 
@@ -36,9 +36,9 @@ function renderMoods() {
 
 function renderFields() {
   const l = getLandscape(state.landscape);
-  $("#fields").innerHTML = FIELDS.map((f) => {
-    const single = f === "structure";
-    const chips = l[f].map((opt, i) => {
+  $("#fields").innerHTML = ALL_FIELDS.map((f) => {
+    const single = SINGLE.has(f);
+    const chips = optionsFor(l, f).map((opt, i) => {
       const on = (state.sel[f] || []).includes(i);
       return `<button type="button" class="chip ${on ? "active" : ""}" data-field="${f}" data-i="${i}" aria-pressed="${on}">${opt}</button>`;
     }).join("");
@@ -59,6 +59,7 @@ function renderOptions() {
   $("#aspect").innerHTML = ASPECTS.map((a) => `<option ${a === state.aspect ? "selected" : ""}>${a}</option>`).join("");
   $("#aspect-wrap").hidden = state.format !== "midjourney";
   $("#negative").checked = state.negative;
+  $("#title-space").checked = state.titleSpace;
   $("#extra").value = state.extra;
 }
 
@@ -112,7 +113,7 @@ $("#fields").addEventListener("click", (e) => {
   const b = e.target.closest(".chip"); if (!b) return;
   const f = b.dataset.field, i = +b.dataset.i;
   let cur = state.sel[f] || [];
-  if (f === "structure") cur = [i];
+  if (SINGLE.has(f)) cur = [i];
   else if (cur.includes(i)) { if (cur.length > 1) cur = cur.filter((x) => x !== i); }
   else cur = [...cur, i].sort();
   state.sel[f] = cur; renderFields(); renderOutput();
@@ -124,6 +125,7 @@ $("#fields").addEventListener("input", (e) => {
 $("#format").addEventListener("change", (e) => { state.format = e.target.value; renderOptions(); renderOutput(); });
 $("#aspect").addEventListener("change", (e) => { state.aspect = e.target.value; renderOutput(); });
 $("#negative").addEventListener("change", (e) => { state.negative = e.target.checked; renderOutput(); });
+$("#title-space").addEventListener("change", (e) => { state.titleSpace = e.target.checked; renderOutput(); });
 $("#extra").addEventListener("input", (e) => { state.extra = e.target.value; renderOutput(); });
 $("#randomize").addEventListener("click", () => { state = randomState(state); renderAll(); });
 $("#reset").addEventListener("click", () => { state = { ...base, sel: defaultSelection(), custom: {} }; renderAll(); });

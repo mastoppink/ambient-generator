@@ -3,9 +3,12 @@
 Web statis untuk merakit prompt gambar bertema **kenopsia, megalophobia, liminal space, dan dark ambient** dari master template.
 
 ## Fitur
-- 6 landscape (Abyssal, Desert, Frozen, Forest, Alien, Urban Liminal) dan 3 nuansa (Kenopsia, Megalophobia, Liminal)
-- Pilih detail (structure, decay, atmosphere, lighting) atau tulis nilai custom sendiri
-- Format output: Plain, Midjourney (`--ar`, `--no`) dan Stable Diffusion (positive/negative)
+- Dioptimalkan untuk latar musik ambient: subjek kecil dan jauh, ruang kosong dominan, cahaya redup, kontras rendah
+- 6 landscape (Abyssal, Desert, Frozen, Forest, Alien, Urban Liminal) dengan thumbnail
+- 4 nuansa: Ambient Solitude (default), Kenopsia, Megalophobia, Liminal Space
+- Pilih detail (structure, decay, atmosphere, lighting, distance, emptiness) atau tulis nilai custom sendiri
+- Toggle "Ruang untuk judul" untuk menyisakan area kosong bagi teks judul lagu
+- Format output: Plain, Midjourney (`--ar 16:9 --style raw --stylize 50 --no`), Stable Diffusion (positive/negative) dan Flux (kalimat natural)
 - Tombol acak, salin, link share (state tersimpan di URL) dan riwayat (localStorage)
 
 ## Jalankan lokal
