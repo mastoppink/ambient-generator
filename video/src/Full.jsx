@@ -75,7 +75,11 @@ const Intro = ({ frame, total, fps, title = "", subtitle = "", channel = "" }) =
   const appear = (a, d = 2.2) => ease(interpolate(s, [a, a + d], [0, 1], clamp));
   const out = interpolate(s, [end - 2.6, end - 0.2], [1, 0], clamp);
   const band = Math.min(appear(0.8, 2.5), out);
-  const tracking = interpolate(s, [1.6, end], [0.34, 0.42], clamp); // em
+  // Title reveal: from soft blur and wide tracking, the letters settle and sharpen into place, then keep breathing open very slowly.
+  const r = ease(interpolate(s, [1.5, 4.6], [0, 1], clamp));
+  const tracking = 0.62 - 0.26 * r + interpolate(s, [4.6, end], [0, 0.04], clamp); // em
+  const titleBlur = (1 - r) * 10;
+  const titleScale = 1.035 - 0.035 * r;
   const ivory = "#f3f0ea";
   const pair = SIZE; // per-font optical size
   return (
@@ -88,9 +92,10 @@ const Intro = ({ frame, total, fps, title = "", subtitle = "", channel = "" }) =
         )}
         {channel && <div style={{ width: 1, height: 34, background: ivory, opacity: 0.4 * appear(1.4), margin: "26px 0 30px" }} />}
         <div style={{ fontFamily: SERIF, fontWeight: SERIF_W, fontSize: Math.round(64 * pair), letterSpacing: `${tracking}em`, marginRight: `-${tracking}em`,
-          textTransform: "uppercase", lineHeight: 1.1, opacity: appear(1.6, 2.8) }}>{title}</div>
-        {subtitle && <div style={{ width: 64, height: 1, background: ivory, opacity: 0.5 * appear(3.4), margin: "34px 0 26px" }} />}
-        {subtitle && <div style={{ fontFamily: SERIF, fontStyle: "italic", fontWeight: SERIF_W, fontSize: Math.round(30 * pair), letterSpacing: "0.04em", opacity: 0.82 * appear(3.8) }}>{subtitle}</div>}
+          textTransform: "uppercase", lineHeight: 1.1, opacity: Math.min(1, r * 1.6), filter: titleBlur > 0.05 ? `blur(${titleBlur.toFixed(2)}px)` : "none",
+          transform: `scale(${titleScale})` }}>{title}</div>
+        {subtitle && <div style={{ width: 64, height: 1, background: ivory, opacity: 0.5 * appear(4.2), margin: "34px 0 26px", transform: `scaleX(${appear(4.2, 1.6)})` }} />}
+        {subtitle && <div style={{ fontFamily: SERIF, fontStyle: "italic", fontWeight: SERIF_W, fontSize: Math.round(30 * pair), letterSpacing: "0.04em", opacity: 0.82 * appear(4.8) }}>{subtitle}</div>}
       </AbsoluteFill>
       <AbsoluteFill style={{ backgroundColor: "black", opacity: black }} />
     </AbsoluteFill>
