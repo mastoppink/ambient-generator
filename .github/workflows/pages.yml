@@ -22,6 +22,18 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: video/package-lock.json
+      - name: Build Video Studio
+        working-directory: video
+        run: |
+          npm ci
+          npm run build:web
+      - name: Remove build-only files from the site
+        run: rm -rf video/node_modules
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

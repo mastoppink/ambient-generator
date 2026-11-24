@@ -13,11 +13,16 @@ Web statis untuk merakit prompt gambar bertema **kenopsia, megalophobia, liminal
 - Toggle "Ruang untuk judul", kalimat tambahan bebas
 - Tombol acak, salin, link share (state tersimpan di URL) dan riwayat (localStorage)
 
-## Membuat video (Remotion)
-Folder [`video/`](video/README.md) berisi project Remotion: gambar + audio + `video-config.json` (diunduh dari web) → video MP4 panjang dengan overlay hidup. Dijalankan di komputer sendiri (`cd video && npm install && npm run make`), tidak di GitHub Pages.
+## Membuat video
+**Video Studio** (`studio.html`) merender video langsung di browser dengan Remotion (`@remotion/web-renderer`): pilih gambar + audio → atur overlay → **Render Video**. Hanya loop pendek yang dirender, lalu diulang sepanjang audio (mediabunny, tanpa render ulang) dan disimpan sebagai MP4. Butuh Chrome/Edge desktop. Tombol **Buka Video Studio** di generator membawa pengaturan overlay otomatis.
+
+Alternatif lewat terminal (Node.js): lihat [`video/README.md`](video/README.md).
+
+Kode Video Studio ada di `video/web/` dan di-build oleh workflow GitHub Pages (`npm run build:web` → `studio/studio.js`).
 
 ## Jalankan lokal
 ```bash
+(cd video && npm install && npm run build:web)   # sekali, untuk Video Studio
 python3 -m http.server 8000
 # buka http://localhost:8000
 ```

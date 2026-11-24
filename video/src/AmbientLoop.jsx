@@ -17,7 +17,7 @@ export const AmbientLoop = ({ image, overlays: o }) => {
 
   return (
     <AbsoluteFill style={{ backgroundColor: "black", overflow: "hidden" }}>
-      <Img src={staticFile(image)} style={{
+      <Img src={/^(blob:|data:|https?:)/.test(image) ? image : staticFile(image)} style={{
         position: "absolute", width: "100%", height: "100%", objectFit: "cover", transform: `scale(${scale})`,
       }} />
       <AbsoluteFill style={{ backgroundColor: breathe > 0 ? "white" : "black", opacity: Math.abs(breathe) }} />

@@ -1,9 +1,9 @@
-import { LANDSCAPES, MOODS, ASPECTS } from "./data.js?v=7";
+import { LANDSCAPES, MOODS, ASPECTS } from "./data.js?v=8";
 import {
   ALL_FIELDS, SINGLE, optionsFor, getLandscape, defaultSelection, buildPrompt, randomState, serialize, parse,
-} from "./generator.js?v=7";
-import { stateFromTitle } from "./title.js?v=7";
-import { overlayPlan, overlayNotes, overlayAssetPrompt, videoConfig } from "./overlays.js?v=7";
+} from "./generator.js?v=8";
+import { stateFromTitle } from "./title.js?v=8";
+import { overlayPlan, overlayNotes, overlayAssetPrompt, videoConfig } from "./overlays.js?v=8";
 
 const $ = (s) => document.querySelector(s);
 const FIELD_LABELS = {
@@ -127,6 +127,11 @@ $("#aspect").addEventListener("change", (e) => { state.aspect = e.target.value; 
 $("#style").addEventListener("change", (e) => { state.style = e.target.value; renderOutput(); });
 $("#copy-notes").addEventListener("click", (e) => copy(overlayNotes(overlayPlan(state)).map((n) => "- " + n).join("\n"), e.target));
 $("#copy-overlay").addEventListener("click", (e) => copy($("#overlay-prompt").value, e.target));
+$("#open-studio").addEventListener("click", () => {
+  const cfg = videoConfig(state, overlayPlan(state));
+  const enc = btoa(unescape(encodeURIComponent(JSON.stringify(cfg))));
+  window.open("./studio.html?cfg=" + encodeURIComponent(enc), "_blank");
+});
 $("#download-config").addEventListener("click", () => {
   const cfg = videoConfig(state, overlayPlan(state));
   const url = URL.createObjectURL(new Blob([JSON.stringify(cfg, null, 2)], { type: "application/json" }));

@@ -1,5 +1,7 @@
 # Ambient Video (Remotion)
 
+> Cara termudah: pakai **Video Studio** di situs (render langsung di browser). Panduan di bawah untuk render lewat terminal.
+
 Membuat video ambient panjang dari **1 gambar + 1 audio**, dengan overlay hidup (kabut, partikel, bintang, aurora, grain, slow zoom).
 Semua gerakan dibuat **berulang sempurna (seamless loop)**, jadi yang dirender hanya klip pendek (default 30 detik), lalu diulang sepanjang audio tanpa render ulang. Video 3 jam selesai dalam hitungan menit.
 

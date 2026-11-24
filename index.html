@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@400;500&family=JetBrains+Mono&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./css/style.css?v=7">
+  <link rel="stylesheet" href="./css/style.css?v=8">
 </head>
 <body>
   <header class="hero">
@@ -61,8 +61,9 @@
         <div class="out-head"><span>Overlay &amp; Motion</span></div>
         <ul id="overlay-notes" class="notes"></ul>
         <div class="actions"><button id="copy-notes" type="button">Salin Catatan</button>
+          <button id="open-studio" type="button" class="primary">Buka Video Studio →</button>
           <button id="download-config" type="button">Unduh Config Video</button></div>
-        <p class="hint">Config dipakai project Remotion di folder <a href="https://github.com/mastoppink/prompt-generator/tree/main/video" target="_blank" rel="noopener">video/</a>: gambar + audio + config → video MP4 panjang.</p>
+        <p class="hint">Video Studio merender video MP4 panjang dari gambar + audio langsung di browser, memakai overlay di atas.</p>
         <div class="out-head"><span>Prompt Aset Overlay</span><small>latar hitam, blend Screen</small></div>
         <textarea id="overlay-prompt" readonly rows="5"></textarea>
         <div class="actions"><button id="copy-overlay" type="button">Salin Prompt Overlay</button></div>
@@ -76,6 +77,6 @@
   </main>
 
   <footer>Static app · GitHub Pages</footer>
-  <script type="module" src="./js/app.js?v=7"></script>
+  <script type="module" src="./js/app.js?v=8"></script>
 </body>
 </html>
