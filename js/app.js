@@ -1,7 +1,7 @@
-import { LANDSCAPES, MOODS, FORMATS, ASPECTS } from "./data.js";
+import { LANDSCAPES, MOODS, FORMATS, ASPECTS } from "./data.js?v=2";
 import {
   FIELDS, getLandscape, defaultSelection, buildOutput, randomState, serialize, parse,
-} from "./generator.js";
+} from "./generator.js?v=2";
 
 const $ = (s) => document.querySelector(s);
 const FIELD_LABELS = {

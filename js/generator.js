@@ -1,4 +1,4 @@
-import { TEMPLATE, NEGATIVE, LANDSCAPES, MOODS } from "./data.js";
+import { TEMPLATE, NEGATIVE, LANDSCAPES, MOODS } from "./data.js?v=2";
 
 export const FIELDS = ["structure", "decay", "atmosphere", "lighting"];
 
