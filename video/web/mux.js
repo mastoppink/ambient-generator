@@ -8,6 +8,22 @@ import { registerAacEncoder } from "@mediabunny/aac-encoder";
 let aacRegistered = false;
 
 /**
+ * Highest AAC bitrate the browser's own encoder accepts for this audio; if it accepts none of the
+ * good ones (common: max 192 kbps, or no AAC encoder at all), registers the WebAssembly AAC encoder.
+ */
+async function pickAacBitrate(track) {
+  const opts = { numberOfChannels: Math.min(2, track.numberOfChannels || 2), sampleRate: track.sampleRate || 48000 };
+  for (const bitrate of [256_000, 192_000]) {
+    if (await canEncodeAudio("aac", { ...opts, bitrate })) return bitrate;
+  }
+  if (!aacRegistered) { registerAacEncoder(); aacRegistered = true; }
+  for (const bitrate of [256_000, 192_000, 128_000]) {
+    if (await canEncodeAudio("aac", { ...opts, bitrate })) return bitrate;
+  }
+  return 128_000;
+}
+
+/**
  * Repeats the (seamless) loop video for the whole audio length and adds the audio.
  * Video packets are copied, never re-encoded, so hours of video are produced quickly.
  * Audio is copied when MP4 supports its codec, otherwise re-encoded to AAC.
@@ -45,8 +61,7 @@ export async function muxLoopWithAudio(loopBlob, audioFile, { writable, onProgre
   if (passthrough) {
     aSrc = new EncodedAudioPacketSource(aTrack.codec);
   } else {
-    if (!(await canEncodeAudio("aac")) && !aacRegistered) { registerAacEncoder(); aacRegistered = true; }
-    aSrc = new AudioSampleSource({ codec: "aac", bitrate: 320_000 });
+    aSrc = new AudioSampleSource({ codec: "aac", bitrate: await pickAacBitrate(aTrack) });
   }
   out.addAudioTrack(aSrc);
   await out.start();
