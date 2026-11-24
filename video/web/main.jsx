@@ -6,6 +6,7 @@ import { AmbientFull, segmentFrames, FONT_PAIRS, INTRO_STYLES, INTRO_LAYOUTS, TO
 import { defaultProps } from "../src/Root.jsx";
 import { muxLoopWithAudio, audioDuration } from "./mux.js";
 import { MaskEditor } from "./MaskEditor.jsx";
+import * as store from "./store.js";
 import { PRESETS, DEFAULT_GRADE, presetFor, applyGrade } from "./grade.js";
 
 // Video bitrate (bits/s) per resolution and quality. "high" matches YouTube's upload recommendation.
@@ -102,7 +103,58 @@ function App() {
     setImageName(name); setImageFile(blob);
     try { const b = await createImageBitmap(blob); setImageSize([b.width, b.height]); b.close(); } catch { setImageSize(null); }
   };
-  const onImage = (f) => { if (!f) return; setUp({ stage: "idle" }); setOrigFile(f); useImage(f, f.name); };
+  const onImage = (f) => {
+    if (!f) return;
+    setUp({ stage: "idle" }); setOrigFile(f); useImage(f, f.name);
+    store.save("orig", { blob: f, name: f.name }); store.remove(["upscaled"]);
+  };
+  const forgetImage = () => {
+    store.remove(["orig", "upscaled"]);
+    setOrigFile(null); setImageFile(null); setImageName(""); setImageSize(null); setImageUrl(null); setUp({ stage: "idle" });
+    gradedBlobRef.current = null;
+  };
+
+  // Restore the saved image (and its 4K upscale) and settings after a reload.
+  const restored = useRef(false);
+  useEffect(() => {
+    (async () => {
+      const [orig, upscaled, settings] = await Promise.all([store.load("orig"), store.load("upscaled"), store.load("settings")]);
+      if (settings) {
+        const fromGenerator = new URLSearchParams(location.search).has("cfg");
+        if (settings.grade) setGrade(settings.grade);
+        if (settings.preset) setPreset(settings.preset);
+        if (settings.resolution) setResolution(settings.resolution);
+        if (settings.quality) setQuality(settings.quality);
+        if (settings.upModel) setUpModel(settings.upModel);
+        setCfg((c) => ({
+          ...c,
+          fontPair: settings.fontPair || c.fontPair,
+          water: settings.water ? { ...c.water, ...settings.water } : c.water,
+          cta: settings.cta ? { ...c.cta, ...settings.cta } : c.cta,
+          // keep the generator's title when the Studio was opened from it
+          intro: settings.intro ? { ...c.intro, ...settings.intro, ...(fromGenerator ? { title: c.intro.title, subtitle: c.intro.subtitle } : {}) } : c.intro,
+          ...(fromGenerator ? {} : { overlays: settings.overlays || c.overlays, loopSeconds: settings.loopSeconds || c.loopSeconds }),
+        }));
+      }
+      if (orig?.blob) {
+        setOrigFile(new File([orig.blob], orig.name, { type: orig.blob.type }));
+        if (upscaled?.blob) {
+          await useImage(upscaled.blob, upscaled.name);
+          setUp({ stage: "done", url: URL.createObjectURL(upscaled.blob), name: upscaled.name, restored: true });
+        } else await useImage(orig.blob, orig.name);
+      }
+      restored.current = true;
+    })();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!restored.current) return;
+    const t = setTimeout(() => store.save("settings", {
+      grade, preset, resolution, quality, upModel, fontPair: cfg.fontPair, water: cfg.water, cta: cfg.cta, intro: cfg.intro,
+      overlays: cfg.overlays, loopSeconds: cfg.loopSeconds,
+    }), 400);
+    return () => clearTimeout(t);
+  }, [grade, preset, resolution, quality, upModel, cfg]);
 
   async function upscale() {
     if (!origFile) return;
@@ -115,6 +167,7 @@ function App() {
       const name = origFile.name.replace(/\.[^.]+$/, "") + "-4k.png";
       await useImage(r.blob, name);
       setUp({ stage: "done", url: URL.createObjectURL(r.blob), name, backend: r.backend });
+      store.save("upscaled", { blob: r.blob, name });
     } catch (e) {
       console.error(e); setUp({ stage: "error", message: e?.message || String(e) });
     }
@@ -222,7 +275,8 @@ function App() {
         <label className="file">
           <span>Gambar latar</span>
           <input type="file" accept="image/*" onChange={(e) => onImage(e.target.files[0])} />
-          <small>{imageName ? `${imageName}${imageSize ? ` · ${imageSize[0]}×${imageSize[1]}` : ""}` : "PNG / JPG / WEBP dari Nano Banana"}</small>
+          <small>{imageName ? `${imageName}${imageSize ? ` · ${imageSize[0]}×${imageSize[1]}` : ""}` : "PNG / JPG / WEBP dari Nano Banana"}
+            {imageName && <> · <a href="#" className="dl" onClick={(e) => { e.preventDefault(); forgetImage(); }}>hapus gambar tersimpan</a></>}</small>
         </label>
         {imageFile && up.stage === "idle" && imageSize && imageSize[0] >= cfg.width * 2 && imageSize[1] >= cfg.height * 2 && (
           <p className="ok upscale">✔ Gambar sudah 4K, tidak perlu upscale.</p>
@@ -239,7 +293,7 @@ function App() {
               ? <button type="button" onClick={upscale}>{up.stage === "done" ? "Upscale ulang dari gambar asli" : "Upscale ke 4K (Real-ESRGAN)"}</button>
               : <div className="progress"><div className="bar"><div style={{ width: Math.round(up.progress * 100) + "%" }} /></div>
                   <small>Upscale {Math.round(up.progress * 100)}% · {up.backend === "webgpu" ? "GPU (WebGPU)" : up.backend ? "CPU (lambat, " + (upModel === "max" ? "bisa >10 menit" : "1–2 menit") + ")" : upModel === "max" ? "mengunduh model 67 MB…" : "memuat model…"}</small></div>}
-            {up.stage === "done" && <p className="ok" style={{ margin: 0 }}>✔ Gambar 4K dipakai untuk video</p>}
+            {up.stage === "done" && <p className="ok" style={{ margin: 0 }}>✔ Gambar 4K dipakai untuk video{up.restored ? " (dipulihkan dari sesi sebelumnya)" : ""}</p>}
             {imageUrl && <a className="dl" href={imageUrl} download={(imageName || "background").replace(/\.[^.]+$/, "") + "-graded.jpg"}>Unduh gambar (dengan grading)</a>}
             {up.stage === "error" && <p className="err">✖ {up.message}</p>}
           </div>
