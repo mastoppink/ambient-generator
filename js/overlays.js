@@ -1,4 +1,4 @@
-import { getLandscape } from "./generator.js?v=9";
+import { getLandscape } from "./generator.js?v=10";
 
 /*
  * Overlay & motion plan per landscape, adjusted by the prompt's extra sentences

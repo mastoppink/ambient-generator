@@ -1,12 +1,12 @@
-import { TITLE_SPACE, DESERTED, STYLES, LANDSCAPES, MOODS, DISTANCES, EMPTINESS } from "./data.js?v=9";
+import { TITLE_SPACE, DESERTED, STYLES, LANDSCAPES, MOODS, DISTANCES, EMPTINESS } from "./data.js?v=10";
 
 /** Per-landscape fields */
-export const FIELDS = ["structure", "decay", "atmosphere", "lighting"];
+export const FIELDS = ["structure", "foreground", "decay", "atmosphere", "lighting"];
 /** Global fields (same options for every landscape) */
 export const GLOBAL = { distance: DISTANCES, emptiness: EMPTINESS };
 export const ALL_FIELDS = [...FIELDS, ...Object.keys(GLOBAL)];
-export const SINGLE = new Set(["structure", "distance"]);
-const KEYS = { structure: "s", decay: "d", atmosphere: "a", lighting: "g", distance: "x", emptiness: "e" };
+export const SINGLE = new Set(["structure", "distance", "foreground"]);
+const KEYS = { structure: "s", foreground: "o", decay: "d", atmosphere: "a", lighting: "g", distance: "x", emptiness: "e" };
 
 export const getLandscape = (id) => LANDSCAPES.find((l) => l.id === id) || LANDSCAPES[0];
 export const getMood = (id) => MOODS.find((m) => m.id === id) || MOODS[0];
@@ -41,12 +41,14 @@ export function buildPrompt(state) {
   const palette = state.custom?.palette?.trim() || l.palette;
   const sentences = [
     m.camera.replace("{L}", landscape),
-    `Far in the distance stands a lone ${val("structure") || l.structure[0]}, ${val("distance")}.`,
-    val("decay") && `It is worn by time: ${val("decay")}.`,
+    `A lone ${val("structure") || l.structure[0]} stands ${val("distance")}.`,
+    val("foreground") && `In the foreground, ${val("foreground")}, giving the eye a path into the scene.`,
+    val("decay") && `The structure is worn by time: ${val("decay")}.`,
     val("atmosphere") && `The air is filled with ${val("atmosphere")}.`,
     val("lighting") && `The only light is ${val("lighting")}.`,
+    `A faint, cold glow behind the structure separates its silhouette from the haze and makes it the clear focal point.`,
     `The color palette is restrained: ${palette}.`,
-    val("emptiness") && `The composition is dominated by ${val("emptiness")}, with empty space filling most of the frame.`,
+    val("emptiness") && `The composition is dominated by ${val("emptiness")}, with generous empty space around the structure.`,
     m.feeling,
     DESERTED,
     (STYLES[state.style] || STYLES.photo).text,
