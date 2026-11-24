@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@400;500&family=JetBrains+Mono&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./css/style.css?v=4">
+  <link rel="stylesheet" href="./css/style.css?v=5">
 </head>
 <body>
   <header class="hero">
@@ -18,6 +18,13 @@
 
   <main class="layout">
     <section class="controls">
+      <h2><span class="num">00</span> Auto dari Judul Audio</h2>
+      <div class="title-gen">
+        <input id="title-input" class="custom" placeholder="mis. Sunken Cathedral · 3 Hours Deep Ocean Drone for Sleep">
+        <button id="title-generate" type="button" class="primary-btn">Generate</button>
+      </div>
+      <p id="title-detected" class="hint">Tulis judul audio (Inggris/Indonesia), generator memilih landscape, nuansa dan detail yang cocok. Hasilnya tetap bisa diubah manual.</p>
+
       <h2><span class="num">01</span> Landscape</h2>
       <div id="landscapes" class="cards"></div>
 
@@ -57,6 +64,6 @@
   </main>
 
   <footer>Static app · GitHub Pages</footer>
-  <script type="module" src="./js/app.js?v=4"></script>
+  <script type="module" src="./js/app.js?v=5"></script>
 </body>
 </html>

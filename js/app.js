@@ -1,7 +1,8 @@
-import { LANDSCAPES, MOODS, ASPECTS } from "./data.js?v=4";
+import { LANDSCAPES, MOODS, ASPECTS } from "./data.js?v=5";
 import {
   ALL_FIELDS, SINGLE, optionsFor, getLandscape, defaultSelection, buildPrompt, randomState, serialize, parse,
-} from "./generator.js?v=4";
+} from "./generator.js?v=5";
+import { stateFromTitle } from "./title.js?v=5";
 
 const $ = (s) => document.querySelector(s);
 const FIELD_LABELS = {
@@ -128,5 +129,18 @@ $("#history").addEventListener("click", (e) => {
   const b = e.target.closest(".hist"); if (b) copy(b.textContent, b);
 });
 $("#clear-history").addEventListener("click", () => { safeSet(HISTORY_KEY, []); renderHistory(); });
+
+function generateFromTitle() {
+  const title = $("#title-input").value.trim();
+  if (!title) { $("#title-input").focus(); return; }
+  const { state: next, detected } = stateFromTitle(title, { ...state, sel: defaultSelection(), custom: {} });
+  state = next; renderAll();
+  const tag = (label, ok, why) => `<b>${esc(label)}</b>${ok ? "" : ` <i>(${why})</i>`}`;
+  $("#title-detected").innerHTML =
+    `Landscape: ${tag(detected.landscape, detected.landscapeMatched, "acak, tidak ada kata kunci")} · Nuansa: ${tag(detected.mood, detected.moodMatched, "default")}` +
+    (detected.extras ? ` · ${detected.extras} kalimat suasana ditambahkan` : "");
+}
+$("#title-generate").addEventListener("click", generateFromTitle);
+$("#title-input").addEventListener("keydown", (e) => { if (e.key === "Enter") generateFromTitle(); });
 
 renderAll(); renderHistory();

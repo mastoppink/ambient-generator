@@ -101,3 +101,9 @@ textarea { font: .82rem/1.6 var(--mono); resize: vertical; background: var(--pan
 footer { text-align: center; color: #454c56; font-size: .75rem; padding: 40px 16px; }
 .badge { border: 1px solid var(--accent); color: var(--accent); border-radius: 999px; padding: 3px 10px; font-size: .72rem; letter-spacing: .08em; }
 textarea#out-positive { font-family: var(--sans); font-size: .88rem; line-height: 1.7; }
+.title-gen { display: flex; gap: 8px; }
+.title-gen .custom { flex: 1; font-size: .9rem; padding: 10px 12px; }
+.primary-btn { background: var(--accent); border: 1px solid var(--accent); color: #0a1213; font-weight: 500; border-radius: 8px; padding: 0 16px; cursor: pointer; }
+.primary-btn:hover { filter: brightness(1.1); }
+.hint { color: var(--muted); font-size: .78rem; margin: 8px 0 0; }
+.hint b { color: var(--text); font-weight: 500; }
