@@ -1,5 +1,5 @@
-import { LANDSCAPES, MOODS } from "./data.js?v=14";
-import { ALL_FIELDS, SINGLE, optionsFor, getLandscape } from "./generator.js?v=14";
+import { LANDSCAPES, MOODS } from "./data.js?v=15";
+import { ALL_FIELDS, SINGLE, optionsFor, getLandscape } from "./generator.js?v=15";
 
 /*
  * Title → prompt rules (English + Indonesian).
@@ -31,6 +31,10 @@ const RULES = [
   R("landscape", ["ice", "icy", "frozen", "snow", "arctic", "polar", "glacier", "winter", "cold", "tundra", "frost", "es", "salju", "beku", "dingin"], { land: { frozen: 2 } }),
   R("landscape", ["forest", "woods", "mist", "misty", "fog", "foggy", "moss", "grove", "swamp", "marsh", "hutan", "kabut", "lumut", "rawa"], { land: { forest: 2 } }),
   R("landscape", ["space", "planet", "star", "alien", "lunar", "astral", "interstellar", "eclipse", "angkasa", "bintang", "planet asing"], { land: { alien: 2 } }),
+  R("landscape", ["salt", "salt flat", "mirror", "reflection", "reflections", "garam", "cermin", "pantulan"], { land: { saltflat: 2 } }),
+  R("landscape", ["ash", "ashes", "volcano", "volcanic", "lava", "ember", "embers", "obsidian", "abu", "vulkanik", "gunung api"], { land: { volcanic: 2 } }),
+  R("landscape", ["coast", "shore", "lighthouse", "harbor", "harbour", "pier", "cliff", "cliffs", "pantai", "pesisir", "mercusuar", "dermaga", "tebing"], { land: { coast: 2 } }),
+  R("landscape", ["cave", "caves", "cavern", "underground", "grotto", "gua", "goa", "bawah tanah"], { land: { cavern: 2 } }),
   R("landscape", ["city", "urban", "concrete", "mall", "hallway", "corridor", "backrooms", "station", "metro", "subway", "poolrooms", "megablock", "kota", "lorong", "beton", "stasiun", "gedung"], { land: { urban: 2 } }),
 
   /* ---------- 1. Modes → mood + brightness ---------- */

@@ -1,9 +1,9 @@
-import { LANDSCAPES, MOODS, ASPECTS, REVISIONS } from "./data.js?v=14";
+import { LANDSCAPES, MOODS, ASPECTS, REVISIONS } from "./data.js?v=15";
 import {
   ALL_FIELDS, SINGLE, optionsFor, getLandscape, defaultSelection, buildPrompt, randomState, serialize, parse,
-} from "./generator.js?v=14";
-import { stateFromTitle } from "./title.js?v=14";
-import { overlayPlan, overlayNotes, overlayAssetPrompts, videoConfig } from "./overlays.js?v=14";
+} from "./generator.js?v=15";
+import { stateFromTitle } from "./title.js?v=15";
+import { overlayPlan, overlayNotes, overlayAssetPrompts, videoConfig } from "./overlays.js?v=15";
 
 const $ = (s) => document.querySelector(s);
 const FIELD_LABELS = {
@@ -71,7 +71,11 @@ function renderOutput() {
   const assets = overlayAssetPrompts(plan, state.aspect);
   $("#overlay-fog").value = assets.fog;
   $("#overlay-particles").value = assets.particles;
-  $("#char-count").textContent = `${positive.split(/\s+/).length} kata`;
+  const n = positive.length;
+  const cc = $("#char-count");
+  cc.textContent = `${n} karakter · ${positive.split(/\s+/).length} kata`;
+  cc.className = n > 2000 ? "warn" : "";
+  cc.title = n > 2000 ? "Prompt panjang: Nano Banana bisa mengabaikan sebagian detail. Kurangi pilihan atau kalimat tambahan." : "";
   history.replaceState(null, "", "?" + serialize(state));
 }
 
@@ -105,7 +109,7 @@ function pushHistory(text) {
 /* ---------- events ---------- */
 $("#landscapes").addEventListener("click", (e) => {
   const b = e.target.closest(".card"); if (!b) return;
-  state.landscape = b.dataset.id; state.sel = defaultSelection(); state.custom = {};
+  state.landscape = b.dataset.id; state.sel = defaultSelection(getLandscape(b.dataset.id)); state.custom = {};
   renderLandscapes(); renderFields(); renderOutput();
 });
 $("#moods").addEventListener("click", (e) => {
@@ -144,7 +148,7 @@ $("#download-config").addEventListener("click", () => {
 $("#title-space").addEventListener("change", (e) => { state.titleSpace = e.target.checked; renderOutput(); });
 $("#extra").addEventListener("input", (e) => { state.extra = e.target.value; renderOutput(); });
 $("#randomize").addEventListener("click", () => { state = randomState(state); renderAll(); });
-$("#reset").addEventListener("click", () => { state = { ...base, sel: defaultSelection(), custom: {} }; renderAll(); });
+$("#reset").addEventListener("click", () => { state = { ...base, sel: defaultSelection(getLandscape(base.landscape)), custom: {} }; renderAll(); });
 $("#copy-positive").addEventListener("click", (e) => { const t = $("#out-positive").value; copy(t, e.target); pushHistory(t); });
 $("#copy-link").addEventListener("click", (e) => copy(location.href, e.target));
 $("#history").addEventListener("click", (e) => {

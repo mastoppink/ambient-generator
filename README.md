@@ -5,13 +5,14 @@ Web statis untuk merakit prompt gambar bertema **kenopsia, megalophobia, liminal
 ## Fitur
 - Prompt khusus **Nano Banana** (Gemini image): kalimat naratif, bukan daftar kata kunci; larangan ditulis sebagai deskripsi (tanpa negative prompt); aspect ratio disebut dalam teks
 - Dioptimalkan untuk latar musik ambient: subjek jelas sebagai titik fokus (sepertiga tinggi frame, siluet dipisahkan cahaya samar), elemen latar depan yang menuntun mata, ruang kosong lega, cahaya redup, kontras rendah
-- 6 landscape dengan thumbnail dan 4 nuansa: Ambient Solitude (default), Kenopsia, Megalophobia, Liminal Space
-- Pilih detail (structure, foreground, decay, atmosphere, lighting, framing, kejutan, emptiness). Framing (10 pola komposisi & lensa) dan kejutan (detail tak terduga) dipilih acak agar hasil tidak monoton atau tulis nilai custom sendiri
+- 10 landscape dengan thumbnail (Abyssal, Desert, Frozen, Forest, Alien, Urban, Salt Flat, Volcanic, Foggy Coast, Cavern), masing-masing 6–8 struktur, 4–5 foreground, 4 pencahayaan; 4 nuansa: Ambient Solitude (default), Kenopsia, Megalophobia, Liminal Space
+- Pilih detail (structure, foreground, decay, atmosphere, lighting, framing, kejutan, emptiness). Framing (16 pola komposisi & lensa) dan kejutan (15 detail tak terduga) dipilih acak agar hasil tidak monoton atau tulis nilai custom sendiri
 - **Auto dari judul audio**: ketik judul (Inggris/Indonesia), generator mendeteksi kata kunci untuk memilih landscape, nuansa, detail dan kalimat suasana. Memahami bank kata judul ambient: mode/suasana (Lydian–Phrygian), kecerahan, citra luar angkasa (jadi langit), melodi, tujuan, bentuk lagu, nama chapter; kata terlarang (432, Hz, binaural, healing, …) diabaikan. Judul yang sama selalu memberi hasil yang sama. Aturannya ada di `RULES` dalam `js/title.js`
 - Gaya **Fotorealistis** (default) atau Matte Painting
 - Panel **Overlay & Motion**: catatan editing, prompt aset overlay (latar hitam untuk blend Screen) dan unduh config untuk video
 - **Prompt Revisi**: pilih masalah pada gambar (miniatur, tempelan, terlalu ramai, terlalu terang, dll.) → salin instruksi edit untuk dikirim di chat Nano Banana yang sama
 - Toggle "Ruang untuk judul", kalimat tambahan bebas
+- Prompt dipadatkan (±1.300–1.800 karakter) dengan penghitung karakter; peringatan jika > 2.000 karakter agar Nano Banana tetap patuh pada detail
 - Tombol acak, salin, link share (state tersimpan di URL) dan riwayat (localStorage)
 
 ## Membuat video
