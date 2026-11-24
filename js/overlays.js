@@ -1,4 +1,4 @@
-import { getLandscape } from "./generator.js?v=18";
+import { getLandscape } from "./generator.js?v=19";
 
 /*
  * Overlay & motion plan per landscape, adjusted by the prompt's extra sentences
@@ -33,9 +33,9 @@ export function overlayPlan(state) {
     stars: !!base.stars,
     aurora: false,
     rays: !!base.rays,
-    grain: 0.05,
-    vignette: 0.35,
-    zoom: 0.04,
+    grain: 0.02,
+    vignette: 0.01,
+    zoom: 0.01,
     breathe: 0.03,
   };
   if (/rain/.test(text)) plan.particles = { kind: "rain", count: 260 };
@@ -43,7 +43,6 @@ export function overlayPlan(state) {
   else if (/glint|glass|droplets/.test(text)) plan.particles = { kind: "sparkle", count: 60 };
   if (/star|galaxy|nebula|void|deep space|night sky|moon/.test(text)) plan.stars = true;
   if (/aurora/.test(text)) plan.aurora = true;
-  if (/dim and deep|dark|night/.test(text)) plan.vignette = 0.5;
   if (/mist|fog/.test(text)) plan.fog.opacity = Math.min(0.45, plan.fog.opacity + 0.1);
   if (l.id === "abyssal") plan.stars = false;
   return plan;

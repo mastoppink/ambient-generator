@@ -1,9 +1,9 @@
-import { LANDSCAPES, MOODS, ASPECTS, REVISIONS } from "./data.js?v=18";
+import { LANDSCAPES, MOODS, ASPECTS, REVISIONS } from "./data.js?v=19";
 import {
   ALL_FIELDS, SINGLE, optionsFor, getLandscape, defaultSelection, buildPrompt, randomState, serialize, parse,
-} from "./generator.js?v=18";
-import { stateFromTitle } from "./title.js?v=18";
-import { overlayPlan, overlayNotes, overlayAssetPrompts, videoConfig } from "./overlays.js?v=18";
+} from "./generator.js?v=19";
+import { stateFromTitle } from "./title.js?v=19";
+import { overlayPlan, overlayNotes, overlayAssetPrompts, videoConfig } from "./overlays.js?v=19";
 
 const $ = (s) => document.querySelector(s);
 const FIELD_LABELS = {

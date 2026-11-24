@@ -13,9 +13,9 @@ export const defaultProps = {
     stars: false,
     aurora: false,
     rays: false,
-    grain: 0.05,
-    vignette: 0.35,
-    zoom: 0.04,
+    grain: 0.02,
+    vignette: 0.01,
+    zoom: 0.01,
     breathe: 0.03,
   },
 };

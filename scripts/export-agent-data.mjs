@@ -42,7 +42,7 @@ const out = {
   studio: {
     cfgParam: "studio.html?cfg=<base64(UTF-8 JSON)>",
     cfgExample: { image: "background.png", width: 1920, height: 1080, fps: 30, scale: 2, loopSeconds: 30, landscape: "frozen",
-      overlays: { fog: { color: "#e8eff3", opacity: 0.28 }, particles: { kind: "snow", count: 220 }, stars: false, aurora: false, rays: false, grain: 0.05, vignette: 0.35, zoom: 0.04, breathe: 0.03 } },
+      overlays: { fog: { color: "#e8eff3", opacity: 0.28 }, particles: { kind: "snow", count: 220 }, stars: false, aurora: false, rays: false, grain: 0.02, vignette: 0.01, zoom: 0.01, breathe: 0.03 } },
     particleKinds: ["snow", "rain", "dust", "sediment", "stardust", "sparkle"],
     resolutions: { "1080": 1, "1440": 1.3333, "2160": 2 },
     upscaleModels: { max: "Real-ESRGAN x4plus (most detail, needs GPU)", fast: "Real-ESRGAN General x4v3 dn0.3 (fast)" },
