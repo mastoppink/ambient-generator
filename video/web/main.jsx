@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { Player } from "@remotion/player";
 import { renderMediaOnWeb, canRenderMediaOnWeb, getEncodableVideoCodecs } from "@remotion/web-renderer";
-import { AmbientFull, segmentFrames, FONT_PAIRS } from "../src/Full.jsx";
+import { AmbientFull, segmentFrames, FONT_PAIRS, INTRO_STYLES } from "../src/Full.jsx";
 import { defaultProps } from "../src/Root.jsx";
 import { muxLoopWithAudio, audioDuration } from "./mux.js";
 import { PRESETS, DEFAULT_GRADE, presetFor, applyGrade } from "./grade.js";
@@ -31,7 +31,7 @@ function initialConfig() {
   return {
     ...c,
     loopSeconds: Math.max(10, Math.round(c.loopSeconds / 2) * 2),
-    intro: { enabled: true, seconds: 10, title: t || "Ambient", subtitle: rest.join(" · "), channel: "The Quiet Ruins", ...c.intro },
+    intro: { enabled: true, seconds: 10, reveal: "horizon", title: t || "Ambient", subtitle: rest.join(" · "), channel: "The Quiet Ruins", ...c.intro },
     fontPair: c.fontPair || "classic",
     cta: { enabled: true, text: "For more quiet places,", button: "Subscribe", start: 2, hold: 8, firstMin: 1, everyMin: 20, ...c.cta },
   };
@@ -287,6 +287,10 @@ function App() {
             <label className="row"><span>Judul</span><input className="custom" value={cfg.intro.title} onChange={(e) => setIntro({ title: e.target.value })} /></label>
             <label className="row"><span>Subjudul</span><input className="custom" value={cfg.intro.subtitle} onChange={(e) => setIntro({ subtitle: e.target.value })} /></label>
             <label className="row"><span>Nama channel (opsional)</span><input className="custom" value={cfg.intro.channel} onChange={(e) => setIntro({ channel: e.target.value })} /></label>
+            <label className="row"><span>Gaya kemunculan judul</span>
+              <select value={cfg.intro.reveal} onChange={(e) => setIntro({ reveal: e.target.value })}>
+                {Object.entries(INTRO_STYLES).map(([k, l]) => <option key={k} value={k}>{l}</option>)}
+              </select></label>
             <label className="row"><span>Durasi intro</span>
               <select value={cfg.intro.seconds} onChange={(e) => setIntro({ seconds: +e.target.value })}>
                 {[6, 8, 10, 12].map((s) => <option key={s} value={s}>{s} detik</option>)}

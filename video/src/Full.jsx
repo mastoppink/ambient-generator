@@ -65,23 +65,62 @@ const Letters = ({ text, s, start, step, dur = 1.4, style }) => (
   </span>
 );
 
+export const INTRO_STYLES = {
+  horizon: "Horizon · judul naik dari balik garis",
+  sweep: "Light sweep · cahaya menyapu judul",
+  split: "Split · garis membuka judul & subjudul",
+  minimal: "Minimal · fade sangat lambat",
+  focus: "Focus · buram ke tajam",
+};
+
 /**
  * Title card, restrained European editorial style: small tracked capitals, generous space, slow staggered fades.
- * Channel name → title (tracking widens almost imperceptibly) → hairline → italic subtitle; all dissolve together.
+ * The title reveal itself depends on `reveal` (see INTRO_STYLES).
  */
-const Intro = ({ frame, total, fps, title = "", subtitle = "", channel = "" }) => {
+const Intro = ({ frame, total, fps, title = "", subtitle = "", channel = "", reveal = "horizon" }) => {
   const s = frame / fps, end = total / fps;
   const black = interpolate(s, [0, 2.8], [1, 0], clamp);
   const appear = (a, d = 2.2) => ease(interpolate(s, [a, a + d], [0, 1], clamp));
   const out = interpolate(s, [end - 2.6, end - 0.2], [1, 0], clamp);
   const band = Math.min(appear(0.8, 2.5), out);
-  // Title reveal: from soft blur and wide tracking, the letters settle and sharpen into place, then keep breathing open very slowly.
-  const r = ease(interpolate(s, [1.5, 4.6], [0, 1], clamp));
-  const tracking = 0.62 - 0.26 * r + interpolate(s, [4.6, end], [0, 0.04], clamp); // em
-  const titleBlur = (1 - r) * 10;
-  const titleScale = 1.035 - 0.035 * r;
   const ivory = "#f3f0ea";
   const pair = SIZE; // per-font optical size
+  const breathe = interpolate(s, [4.6, end], [0, 0.03], clamp); // tracking keeps opening almost imperceptibly
+
+  // Defaults (minimal), overridden per reveal style below.
+  let tracking = 0.4 + breathe, titleStyle = { opacity: appear(1.8, 4) }, titleWrap = {};
+  let ruleW = appear(4.4, 1.8), ruleO = appear(4.4, 1.2), ruleWidth = 64;
+  let subStyle = { opacity: appear(5.2, 2.4) }, subWrap = {};
+
+  if (reveal === "focus") {
+    const r = ease(interpolate(s, [1.5, 4.6], [0, 1], clamp));
+    tracking = 0.62 - 0.26 * r + breathe;
+    const blur = (1 - r) * 10;
+    titleStyle = { opacity: Math.min(1, r * 1.6), filter: blur > 0.05 ? `blur(${blur.toFixed(2)}px)` : "none", transform: `scale(${1.035 - 0.035 * r})` };
+    ruleW = appear(4.2, 1.6); ruleO = appear(4.2, 1); subStyle = { opacity: appear(4.8) };
+  } else if (reveal === "horizon") {
+    // The hairline is drawn first; the title then rises from behind it, as if from the horizon.
+    ruleWidth = 200; ruleW = appear(1.2, 2.2); ruleO = appear(1.2, 1);
+    const r = ease(interpolate(s, [2.6, 5.4], [0, 1], clamp));
+    titleWrap = { overflow: "hidden", paddingTop: 8 };
+    titleStyle = { transform: `translateY(${(1 - r) * 105}%)`, opacity: Math.min(1, r * 1.4) };
+    subStyle = { opacity: appear(5.4, 2.2) };
+  } else if (reveal === "sweep") {
+    // A soft-edged band of light uncovers the letters from left to right.
+    const x = interpolate(s, [1.6, 5.2], [-25, 110], clamp);
+    const mask = `linear-gradient(90deg, #000 ${x}%, rgba(0,0,0,0.35) ${x + 8}%, transparent ${x + 18}%)`;
+    titleStyle = { WebkitMaskImage: mask, maskImage: mask, opacity: appear(1.4, 1) };
+    ruleW = appear(4.8, 1.6); ruleO = appear(4.8, 1); subStyle = { opacity: appear(5.4, 2.2) };
+  } else if (reveal === "split") {
+    // The hairline appears alone, then opens: the title rises above it and the subtitle descends below it.
+    ruleWidth = 120; ruleW = appear(1.2, 2); ruleO = appear(1.2, 1);
+    const r = ease(interpolate(s, [2.8, 5.6], [0, 1], clamp));
+    titleWrap = { overflow: "hidden", paddingTop: 8 };
+    titleStyle = { transform: `translateY(${(1 - r) * 105}%)`, opacity: Math.min(1, r * 1.4) };
+    subWrap = { overflow: "hidden", paddingBottom: 6 };
+    subStyle = { transform: `translateY(${(1 - r) * -110}%)`, opacity: Math.min(1, r * 1.4) * 1 };
+  }
+
   return (
     <AbsoluteFill>
       {/* a very soft horizontal band for legibility, instead of a heavy vignette */}
@@ -91,11 +130,18 @@ const Intro = ({ frame, total, fps, title = "", subtitle = "", channel = "" }) =
           <div style={{ fontFamily: SANS, fontSize: 18, fontWeight: 400, letterSpacing: "0.5em", textTransform: "uppercase", marginRight: "-0.5em", opacity: 0.75 * appear(0.9) }}>{channel}</div>
         )}
         {channel && <div style={{ width: 1, height: 34, background: ivory, opacity: 0.4 * appear(1.4), margin: "26px 0 30px" }} />}
-        <div style={{ fontFamily: SERIF, fontWeight: SERIF_W, fontSize: Math.round(64 * pair), letterSpacing: `${tracking}em`, marginRight: `-${tracking}em`,
-          textTransform: "uppercase", lineHeight: 1.1, opacity: Math.min(1, r * 1.6), filter: titleBlur > 0.05 ? `blur(${titleBlur.toFixed(2)}px)` : "none",
-          transform: `scale(${titleScale})` }}>{title}</div>
-        {subtitle && <div style={{ width: 64, height: 1, background: ivory, opacity: 0.5 * appear(4.2), margin: "34px 0 26px", transform: `scaleX(${appear(4.2, 1.6)})` }} />}
-        {subtitle && <div style={{ fontFamily: SERIF, fontStyle: "italic", fontWeight: SERIF_W, fontSize: Math.round(30 * pair), letterSpacing: "0.04em", opacity: 0.82 * appear(4.8) }}>{subtitle}</div>}
+        <div style={titleWrap}>
+          <div style={{ fontFamily: SERIF, fontWeight: SERIF_W, fontSize: Math.round(64 * pair), letterSpacing: `${tracking}em`, marginRight: `-${tracking}em`,
+            textTransform: "uppercase", lineHeight: 1.1, ...titleStyle }}>{title}</div>
+        </div>
+        {(subtitle || reveal === "horizon" || reveal === "split") && (
+          <div style={{ width: ruleWidth, height: 1, background: `linear-gradient(90deg, transparent, ${ivory}, transparent)`, opacity: 0.6 * ruleO, margin: "30px 0 24px", transform: `scaleX(${ruleW})` }} />
+        )}
+        {subtitle && (
+          <div style={subWrap}>
+            <div style={{ fontFamily: SERIF, fontStyle: "italic", fontWeight: SERIF_W, fontSize: Math.round(30 * pair), letterSpacing: "0.04em", ...subStyle, opacity: 0.82 * (subStyle.opacity ?? 1) }}>{subtitle}</div>
+          </div>
+        )}
       </AbsoluteFill>
       <AbsoluteFill style={{ backgroundColor: "black", opacity: black }} />
     </AbsoluteFill>
