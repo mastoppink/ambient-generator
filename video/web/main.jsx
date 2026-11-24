@@ -167,7 +167,10 @@ function App() {
           <input type="file" accept="image/*" onChange={(e) => onImage(e.target.files[0])} />
           <small>{imageName ? `${imageName}${imageSize ? ` · ${imageSize[0]}×${imageSize[1]}` : ""}` : "PNG / JPG / WEBP dari Nano Banana"}</small>
         </label>
-        {imageFile && (
+        {imageFile && up.stage === "idle" && imageSize && imageSize[0] >= cfg.width * 2 && imageSize[1] >= cfg.height * 2 && (
+          <p className="ok upscale">✔ Gambar sudah 4K, tidak perlu upscale.</p>
+        )}
+        {imageFile && !(up.stage === "idle" && imageSize && imageSize[0] >= cfg.width * 2 && imageSize[1] >= cfg.height * 2) && (
           <div className="upscale">
             {up.stage !== "run" && (
               <select value={upModel} onChange={(e) => setUpModel(e.target.value)}>
