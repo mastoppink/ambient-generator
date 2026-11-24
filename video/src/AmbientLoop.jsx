@@ -291,7 +291,7 @@ function grainTexture(n) {
 
 /** Drop rings for the shader: [x, y, t, size], integer cycles per loop. */
 function waterDrops(p, w) {
-  const n = Math.round((w.drops ?? 0.4) * 16), out = [];
+  const n = Math.min(16, Math.round((w.drops ?? 0.4) * 12)), out = [];
   for (let i = 0; i < n; i++) {
     const q = (k) => random(`drop${k}${i}`);
     const cycles = 1 + Math.floor(q("c") * 2);

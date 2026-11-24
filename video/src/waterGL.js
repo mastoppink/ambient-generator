@@ -9,39 +9,32 @@ void main(){ vUv = vec2(aPos.x * 0.5 + 0.5, 0.5 - aPos.y * 0.5); gl_Position = v
 
 const FRAG = `precision highp float;
 varying vec2 vUv;
-uniform sampler2D uImg; uniform sampler2D uMask;
+uniform sampler2D uImg; uniform sampler2D uMask; uniform sampler2D uNoise;
 uniform vec4 uCover; uniform float uAspect; uniform float uP;
 uniform float uRipple; uniform float uShimmer;
 uniform vec4 uDrops[16]; uniform int uDropCount;
-const float TAU = 6.2831853;
 
-// slope (gradient) of the water height at a point, in perspective-corrected surface space
+// Slope of the water surface. uNoise (tileable): RG = slope of a random multi-wave height field, B = low-frequency field.
+// Scrolling by whole tiles per loop keeps everything seamless.
 vec2 slope(vec2 uv) {
-  float depth = mix(0.22, 1.0, clamp(uv.y, 0.0, 1.0));          // farther (top) = smaller, denser waves
-  vec2 q = vec2(uv.x * uAspect, uv.y * 3.2) / depth;             // squash vertically: ripples look flat
-  vec2 g = vec2(0.0);
-  // a few directional waves: (dir.x, dir.y, wavenumber, temporal cycles)
-  vec4 W[7];
-  W[0] = vec4( 0.98,  0.20, 11.0,  4.0);
-  W[1] = vec4(-0.90,  0.44, 17.0, -6.0);
-  W[2] = vec4( 0.60,  0.80, 23.0,  7.0);
-  W[3] = vec4(-0.35,  0.94, 31.0, -9.0);
-  W[4] = vec4( 0.99, -0.10, 43.0, 11.0);
-  W[5] = vec4(-0.75, -0.66, 57.0, -13.0);
-  W[6] = vec4( 0.20,  0.98, 71.0, 16.0);
-  for (int i = 0; i < 7; i++) {
-    vec2 d = normalize(W[i].xy); float k = W[i].z;
-    float ph = dot(d, q) * k + TAU * W[i].w * uP + float(i) * 1.7;
-    g += d * cos(ph) * (1.0 / k) * k * 0.9 / (1.0 + float(i) * 0.35); // amplitude ∝ 1/k → slope ∝ const, softened
-  }
-  // drop rings: radial waves that grow and fade
+  float depth = mix(0.2, 1.0, clamp(uv.y, 0.0, 1.0));             // far = smaller, denser ripples
+  vec2 q = vec2(uv.x * uAspect, uv.y * 3.0) / depth;                // flattened by perspective
+  vec2 a = texture2D(uNoise, q * 0.55 + vec2(uP * 1.0, uP * 0.0)).rg * 2.0 - 1.0;
+  vec2 b = texture2D(uNoise, q * 1.35 + vec2(-uP * 2.0, uP * 1.0)).rg * 2.0 - 1.0;
+  vec2 c = texture2D(uNoise, q * 3.1 + vec2(uP * 3.0, -uP * 2.0)).rg * 2.0 - 1.0;
+  // calm vs. stirred patches drifting slowly across the surface
+  float calm = texture2D(uNoise, uv * vec2(0.6, 0.9) + vec2(uP, 0.0)).b;
+  calm = smoothstep(0.25, 0.85, calm) * 0.85 + 0.15;
+  vec2 g = (a * 1.0 + b * 0.55 + c * 0.25) * calm;
+  // drop rings: a few concentric wavelets behind the leading ring, decaying with distance and time
   for (int j = 0; j < 16; j++) {
     if (j >= uDropCount) break;
-    vec4 D = uDrops[j];                       // x, y, t (0..1), size
-    vec2 dv = vec2((uv.x - D.x) * uAspect, (uv.y - D.y) * 3.4) / mix(0.22, 1.0, D.y);
-    float dist = length(dv); float r = D.z * 0.16 * D.w;
-    float env = exp(-pow((dist - r) / (0.02 + 0.035 * D.z), 2.0)) * pow(1.0 - D.z, 1.3);
-    g += normalize(dv + 1e-5) * sin((dist - r) * 170.0) * env * 4.5;
+    vec4 D = uDrops[j];                                              // x, y, t (0..1), size
+    vec2 dv = vec2((uv.x - D.x) * uAspect, (uv.y - D.y) * 3.2) / mix(0.2, 1.0, D.y);
+    float dist = length(dv), r = D.z * 0.14 * D.w;
+    float behind = r - dist;                                         // > 0 inside the leading ring
+    float env = exp(-pow(behind / (0.03 + 0.05 * D.z), 2.0)) * step(-0.012, behind) * pow(1.0 - D.z, 1.4);
+    g += normalize(dv + 1e-5) * sin(behind * 150.0) * env * 6.5 * (1.0 + 2.0 * exp(-dist * 30.0) * (1.0 - D.z));
   }
   return g * depth;
 }
@@ -50,21 +43,42 @@ void main() {
   float m = texture2D(uMask, vUv).r;
   if (m < 0.003) { gl_FragColor = vec4(0.0); return; }
   vec2 g = slope(vUv);
-  // refraction/reflection offset: stronger vertical wobble, like real reflections
-  vec2 off = vec2(g.x * 0.0024, g.y * 0.0065) * uRipple;
+  vec2 off = vec2(g.x * 0.0032, g.y * 0.0095) * uRipple;             // reflections wobble mostly vertically
   vec2 uv = clamp(vUv + off, 0.0, 1.0);
   vec3 col = texture2D(uImg, uCover.xy + uv * uCover.zw).rgb;
-  // specular glints where the tilted surface catches the light; stronger on bright reflections
-  vec3 n = normalize(vec3(-g * 0.06 * uRipple, 1.0));
-  float spec = pow(max(dot(n, normalize(vec3(0.0, -0.32, 1.0))), 0.0), 220.0);
-  // soft light/dark shading from the surface slope: makes ripples readable even on dark reflections
-  col *= 1.0 + dot(g, vec2(0.25, 0.97)) * 0.06 * uRipple;
+  col *= 1.0 + dot(g, vec2(0.2, 0.98)) * 0.10 * uRipple;             // soft light/dark from the slope
+  vec3 n = normalize(vec3(-g * 0.08 * uRipple, 1.0));
+  float spec = pow(max(dot(n, normalize(vec3(0.0, -0.3, 1.0))), 0.0), 260.0);
   float lum = dot(col, vec3(0.299, 0.587, 0.114));
-  col += spec * uShimmer * (0.25 + 1.2 * lum) * vec3(1.0, 0.98, 0.95);
-  // slightly darker, cooler water (Fresnel-ish) so it reads as a surface
+  col += spec * uShimmer * (0.2 + 1.2 * lum) * vec3(1.0, 0.98, 0.95);
   col = clamp(mix(col, col * vec3(0.92, 0.96, 1.0), 0.25 * m), 0.0, 1.0);
-  gl_FragColor = vec4(col * m, m); // valid premultiplied alpha (color never exceeds alpha)
+  gl_FragColor = vec4(col * m, m);
 }`;
+
+/** 256×256 tileable noise: RG = slope of a sum of random integer-frequency waves, B = a low-frequency field. */
+function makeNoise() {
+  const N = 256, data = new Uint8Array(N * N * 4);
+  let seed = 12345; const rnd = () => ((seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff);
+  const waves = [];
+  while (waves.length < 40) {
+    const kx = Math.round((rnd() * 2 - 1) * 9), ky = Math.round((rnd() * 2 - 1) * 9);
+    const k = Math.hypot(kx, ky); if (k < 1.5) continue;
+    waves.push([kx, ky, rnd() * Math.PI * 2, 1 / Math.pow(k, 1.6)]);
+  }
+  const low = []; for (let i = 0; i < 6; i++) low.push([Math.round(rnd() * 4 - 2) || 1, Math.round(rnd() * 4 - 2), rnd() * 6.283]);
+  let maxG = 0; const gx = new Float32Array(N * N), gy = new Float32Array(N * N), lo = new Float32Array(N * N);
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
+    let sx = 0, sy = 0, l = 0;
+    for (const [kx, ky, ph, a] of waves) { const c = Math.cos(2 * Math.PI * (kx * x + ky * y) / N + ph) * a; sx += c * kx; sy += c * ky; }
+    for (const [kx, ky, ph] of low) l += Math.sin(2 * Math.PI * (kx * x + ky * y) / N + ph);
+    const i = y * N + x; gx[i] = sx; gy[i] = sy; lo[i] = l; maxG = Math.max(maxG, Math.abs(sx), Math.abs(sy));
+  }
+  for (let i = 0; i < N * N; i++) {
+    data[i * 4] = 128 + 127 * gx[i] / maxG; data[i * 4 + 1] = 128 + 127 * gy[i] / maxG;
+    data[i * 4 + 2] = 128 + 127 * Math.max(-1, Math.min(1, lo[i] / 3)); data[i * 4 + 3] = 255;
+  }
+  return { N, data };
+}
 
 export function createWater(canvas) {
   const gl = canvas.getContext("webgl", { premultipliedAlpha: true, preserveDrawingBuffer: true, alpha: true });
@@ -93,8 +107,11 @@ export function createWater(canvas) {
   const tex = (unit) => { const t = gl.createTexture(); gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, t);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE); return t; };
-  const imgTex = tex(0), maskTex = tex(1);
-  gl.uniform1i(U("uImg"), 0); gl.uniform1i(U("uMask"), 1);
+  const imgTex = tex(0), maskTex = tex(1), noiseTex = tex(2);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+  const nz = makeNoise();
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, nz.N, nz.N, 0, gl.RGBA, gl.UNSIGNED_BYTE, nz.data);
+  gl.uniform1i(U("uImg"), 0); gl.uniform1i(U("uMask"), 1); gl.uniform1i(U("uNoise"), 2);
   let lastImg = null, lastMask = null, lastFit = null;
 
   return {

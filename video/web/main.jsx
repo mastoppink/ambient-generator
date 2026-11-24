@@ -390,9 +390,9 @@ function App() {
             <p className="hint" style={{ margin: "6px 0 8px" }}>Warnai area air dengan kuas. Hanya area itu yang bergerak.{!cfg.water.mask && <b> Belum ada area air.</b>}</p>
             {imageUrl ? <MaskEditor imageUrl={imageUrl} mask={cfg.water.mask} onChange={(mask) => setWater({ mask })} /> : <p className="hint">Pilih gambar dulu.</p>}
             <div className="grid2" style={{ marginTop: 10 }}>
-              <Range label="Riak pantulan" v={cfg.water.ripple} max={1} onChange={(v) => setWater({ ripple: v })} />
-              <Range label="Tetesan" v={cfg.water.drops} max={1} onChange={(v) => setWater({ drops: v })} />
-              <Range label="Kilau" v={cfg.water.shimmer} max={1} onChange={(v) => setWater({ shimmer: v })} />
+              <Range label="Riak pantulan" v={cfg.water.ripple} max={2} onChange={(v) => setWater({ ripple: v })} />
+              <Range label="Tetesan" v={cfg.water.drops} max={2} onChange={(v) => setWater({ drops: v })} />
+              <Range label="Kilau" v={cfg.water.shimmer} max={2} onChange={(v) => setWater({ shimmer: v })} />
             </div>
           </>
         )}
