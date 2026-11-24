@@ -5,8 +5,16 @@ export const TITLE_SPACE =
 export const DESERTED =
   "The scene is completely deserted and silent: no people, no animals, no birds, no vehicles, no footprints, no glowing lights or windows, no text or watermark.";
 
-export const STYLE =
-  "Render it as a cinematic, atmospheric matte painting with soft diffused light, low contrast and desaturated tones, minimal detail in the foreground, and a quiet, meditative feeling, suitable as a still background for a long ambient music video.";
+export const STYLES = {
+  photo: {
+    label: "Fotorealistis",
+    text: "This must look like a real photograph, not a painting, illustration or CGI: shot on a full-frame camera with a 24mm lens at f/8 on a tripod, long exposure, natural available light only, real-world scale and weathered real materials, soft atmospheric haze, subtle film grain, slight lens vignetting and natural noise in the shadows, low contrast and desaturated tones without any oversaturated HDR look, in the spirit of large-format documentary landscape photography. It should feel quiet and meditative, suitable as a still background for a long ambient music video.",
+  },
+  matte: {
+    label: "Matte Painting",
+    text: "Render it as a cinematic, atmospheric matte painting with soft diffused light, low contrast and desaturated tones, minimal detail in the foreground, and a quiet, meditative feeling, suitable as a still background for a long ambient music video.",
+  },
+};
 
 export const DISTANCES = [
   "seen from miles away",

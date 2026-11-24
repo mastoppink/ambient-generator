@@ -1,4 +1,4 @@
-import { TITLE_SPACE, DESERTED, STYLE, LANDSCAPES, MOODS, DISTANCES, EMPTINESS } from "./data.js?v=6";
+import { TITLE_SPACE, DESERTED, STYLES, LANDSCAPES, MOODS, DISTANCES, EMPTINESS } from "./data.js?v=7";
 
 /** Per-landscape fields */
 export const FIELDS = ["structure", "decay", "atmosphere", "lighting"];
@@ -49,7 +49,7 @@ export function buildPrompt(state) {
     val("emptiness") && `The composition is dominated by ${val("emptiness")}, with empty space filling most of the frame.`,
     m.feeling,
     DESERTED,
-    STYLE,
+    (STYLES[state.style] || STYLES.photo).text,
     state.titleSpace && TITLE_SPACE,
     state.extra?.trim() && cap(state.extra.trim().replace(/\.?$/, ".")),
     `Use ${ASPECT_TEXT[state.aspect] || state.aspect}.`,
@@ -85,6 +85,7 @@ export function serialize(state) {
   for (const f of ALL_FIELDS) p.set(KEYS[f], (state.sel[f] || []).join("."));
   p.set("ar", state.aspect);
   p.set("t", state.titleSpace ? "1" : "0");
+  p.set("st", state.style);
   return p.toString();
 }
 
@@ -106,5 +107,6 @@ export function parse(search, base) {
     sel,
     aspect: p.get("ar") || base.aspect,
     titleSpace: p.get("t") !== "0",
+    style: p.get("st") === "matte" ? "matte" : "photo",
   };
 }

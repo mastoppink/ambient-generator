@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@400;500&family=JetBrains+Mono&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="./css/style.css?v=6">
+  <link rel="stylesheet" href="./css/style.css?v=7">
 </head>
 <body>
   <header class="hero">
@@ -42,6 +42,7 @@
       <div class="panel">
         <div class="toolbar">
           <span class="badge">Nano Banana</span>
+          <label>Gaya <select id="style"><option value="photo">Fotorealistis</option><option value="matte">Matte Painting</option></select></label>
           <label>Aspect <select id="aspect"></select></label>
           <label class="toggle"><input type="checkbox" id="title-space"> Ruang untuk judul</label>
         </div>
@@ -57,6 +58,16 @@
       </div>
 
       <div class="panel">
+        <div class="out-head"><span>Overlay &amp; Motion</span></div>
+        <ul id="overlay-notes" class="notes"></ul>
+        <div class="actions"><button id="copy-notes" type="button">Salin Catatan</button>
+          <button id="download-config" type="button">Unduh Config Video</button></div>
+        <div class="out-head"><span>Prompt Aset Overlay</span><small>latar hitam, blend Screen</small></div>
+        <textarea id="overlay-prompt" readonly rows="5"></textarea>
+        <div class="actions"><button id="copy-overlay" type="button">Salin Prompt Overlay</button></div>
+      </div>
+
+      <div class="panel">
         <div class="out-head"><span>Riwayat</span><button id="clear-history" type="button" class="ghost small">Hapus</button></div>
         <ul id="history"></ul>
       </div>
@@ -64,6 +75,6 @@
   </main>
 
   <footer>Static app · GitHub Pages</footer>
-  <script type="module" src="./js/app.js?v=6"></script>
+  <script type="module" src="./js/app.js?v=7"></script>
 </body>
 </html>
