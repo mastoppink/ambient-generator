@@ -1,4 +1,4 @@
-import { getLandscape } from "./generator.js?v=19";
+import { getLandscape } from "./generator.js?v=21";
 
 /*
  * Overlay & motion plan per landscape, adjusted by the prompt's extra sentences
@@ -15,6 +15,10 @@ const BASE = {
   saltflat:{ fog: { color: "#e6eaee", opacity: 0.22 }, particles: { kind: "sparkle", count: 40 } },
   volcanic:{ fog: { color: "#77726e", opacity: 0.26 }, particles: { kind: "snow", count: 160 } },
   coast:   { fog: { color: "#b6c0c8", opacity: 0.34 }, particles: { kind: "dust", count: 50 } },
+  steppe:  { fog: { color: "#c9cfc4", opacity: 0.3 }, particles: { kind: "dust", count: 60 } },
+  mountain:{ fog: { color: "#e6ebef", opacity: 0.3 }, particles: { kind: "snow", count: 90 } },
+  lake:    { fog: { color: "#cdd8dc", opacity: 0.26 }, particles: { kind: "dust", count: 40 } },
+  canyon:  { fog: { color: "#c9a594", opacity: 0.18 }, particles: { kind: "dust", count: 90 } },
   cavern:  { fog: { color: "#6f8a8a", opacity: 0.18 }, particles: { kind: "dust", count: 120 }, rays: true },
 };
 

@@ -1,12 +1,16 @@
-import { TITLE_SPACE, DESERTED, STYLES, ORIGINAL, INTEGRATE, GLOW, LANDSCAPES, MOODS, FRAMINGS, TWISTS, EMPTINESS } from "./data.js?v=19";
+import { TITLE_SPACE, DESERTED, STYLES, ORIGINAL, INTEGRATE, GLOW, LANDSCAPES, MOODS, FRAMINGS, TWISTS, EMPTINESS, MATERIALS, INFLUENCES, ACCENTS, FILM_LOOKS } from "./data.js?v=21";
 
 /** Per-landscape fields */
 export const FIELDS = ["structure", "foreground", "decay", "atmosphere", "lighting"];
 /** Global fields (same options for every landscape) */
-export const GLOBAL = { framing: FRAMINGS.map((f) => f.label), twist: TWISTS.map((t) => t || "(tanpa kejutan)"), emptiness: EMPTINESS };
+export const GLOBAL = {
+  framing: FRAMINGS.map((f) => f.label), twist: TWISTS.map((t) => t || "(tanpa kejutan)"), emptiness: EMPTINESS,
+  material: MATERIALS, influence: INFLUENCES, accent: ACCENTS.map((a) => a || "(tanpa aksen)"), film: FILM_LOOKS,
+};
 export const ALL_FIELDS = [...FIELDS, ...Object.keys(GLOBAL)];
-export const SINGLE = new Set(["structure", "framing", "twist", "foreground", "lighting"]);
-const KEYS = { structure: "s", foreground: "o", decay: "d", atmosphere: "a", lighting: "g", framing: "c", twist: "w", emptiness: "e" };
+export const SINGLE = new Set(["structure", "framing", "twist", "foreground", "lighting", "material", "influence", "accent", "film"]);
+const KEYS = { structure: "s", foreground: "o", decay: "d", atmosphere: "a", lighting: "g", framing: "c", twist: "w", emptiness: "e",
+  material: "k", influence: "i", accent: "n", film: "f" };
 
 export const getLandscape = (id) => LANDSCAPES.find((l) => l.id === id) || LANDSCAPES[0];
 export const getMood = (id) => MOODS.find((m) => m.id === id) || MOODS[0];
@@ -15,22 +19,33 @@ export const optionsFor = (l, f) => GLOBAL[f] || l[f];
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 const join = (arr, sep = ", ") => arr.filter(Boolean).join(sep);
 
-/* Recently used framings are skipped so consecutive images don't share a composition. */
-const recentFramings = [];
-function freshFraming() {
-  const pool = [...FRAMINGS.keys()].filter((i) => !recentFramings.includes(i));
-  const pick = pool[Math.floor(Math.random() * pool.length)];
-  recentFramings.push(pick);
-  if (recentFramings.length > 4) recentFramings.shift();
-  return pick;
+/*
+ * Anti-repetition: for each field, recently used options are skipped when picking at random,
+ * so consecutive prompts rarely share a structure, composition, twist, material or style.
+ * The memory survives reloads (localStorage) so a new session doesn't start from the same picks.
+ */
+const RECENT_KEY = "dap-recent";
+const recent = (() => { try { return JSON.parse(localStorage.getItem(RECENT_KEY)) || {}; } catch { return {}; } })();
+const saveRecent = () => { try { localStorage.setItem(RECENT_KEY, JSON.stringify(recent)); } catch {} };
+export function freshIndex(key, n, memory = Math.min(6, Math.floor(n / 2))) {
+  const used = (recent[key] ||= []);
+  const pool = [...Array(n).keys()].filter((i) => !used.includes(i));
+  const choice = (pool.length ? pool : [...Array(n).keys()])[Math.floor(Math.random() * (pool.length || n))];
+  used.push(choice); while (used.length > memory) used.shift();
+  saveRecent();
+  return choice;
 }
+const freshFraming = () => freshIndex("framing", FRAMINGS.length);
+const RANDOM_SINGLES = ["structure", "foreground", "lighting", "twist", "material", "influence", "accent", "film"];
 
-/** Variety by default: random structure, foreground, lighting, framing and twist; first option elsewhere. */
+/** Variety by default: every descriptive field is picked fresh; decay/atmosphere start with their first option. */
 export function defaultSelection(landscape = LANDSCAPES[0]) {
   const sel = Object.fromEntries(ALL_FIELDS.map((f) => [f, [0]]));
-  for (const f of ["structure", "foreground", "lighting", "twist", "emptiness"]) {
-    sel[f] = [Math.floor(Math.random() * optionsFor(landscape, f).length)];
+  for (const f of RANDOM_SINGLES) {
+    const key = f === "structure" || f === "foreground" || f === "lighting" ? `${landscape.id}.${f}` : f;
+    sel[f] = [freshIndex(key, optionsFor(landscape, f).length)];
   }
+  sel.emptiness = [freshIndex("emptiness", EMPTINESS.length)];
   sel.framing = [freshFraming()];
   return sel;
 }
@@ -58,9 +73,10 @@ export function buildPrompt(state) {
   const framing = state.custom?.framing?.trim() ? { text: state.custom.framing.trim() } : FRAMINGS[(state.sel.framing || [0])[0]] || FRAMINGS[0];
   const twist = state.custom?.twist?.trim() || TWISTS[(state.sel.twist || [0])[0]] || "";
   const decay = val("decay"), atmosphere = val("atmosphere"), lighting = val("lighting");
+  const accentTxt = state.custom?.accent?.trim() || ACCENTS[(state.sel.accent || [0])[0]] || "";
   const sentences = [
     m.camera.replace("{L}", landscape),
-    `Subject: a lone ${val("structure") || l.structure[0]}, ${ORIGINAL}${decay ? `, ${decay}` : ""}.`,
+    `Subject: a lone ${val("structure") || l.structure[0]}${val("material") ? `, built of ${val("material")}` : ""}${val("influence") ? ` with subtle ${val("influence")} details` : ""}, ${ORIGINAL}${decay ? `, ${decay}` : ""}.`,
     twist && `Unexpected detail: ${twist}.`,
     `Composition: ${framing.text}`,
     framing.fg !== false && val("foreground") && `Foreground: ${val("foreground")}, sparse and understated.`,
@@ -68,11 +84,11 @@ export function buildPrompt(state) {
     [atmosphere && `Air: ${atmosphere}`, lighting && `light: ${lighting}`].filter(Boolean).join("; ") + ".",
     GLOW,
     INTEGRATE,
-    `Palette: ${palette}.`,
+    `Palette: ${palette}${accentTxt ? `, with a single subtle accent of ${accentTxt}` : ""}.`,
     val("emptiness") && `Generous empty space, ${val("emptiness")}.`,
     m.feeling,
     DESERTED,
-    (STYLES[state.style] || STYLES.photo).text,
+    state.style === "matte" ? STYLES.matte.text : STYLES.photo.text.replace("A real photograph", `A real ${val("film") || "photograph"}`),
     state.titleSpace && TITLE_SPACE,
     state.extra?.trim() && cap(state.extra.trim().replace(/\.?$/, ".")),
     `${cap(ASPECT_TEXT[state.aspect] || state.aspect)}.`,
@@ -88,15 +104,12 @@ function weightedMood() {
 }
 
 export function randomState(base) {
-  const l = pick(LANDSCAPES);
-  const sel = {};
-  for (const f of ALL_FIELDS) {
+  const l = LANDSCAPES[freshIndex("landscape", LANDSCAPES.length)];
+  const sel = defaultSelection(l);
+  for (const f of ["decay", "atmosphere", "emptiness"]) {
     const n = optionsFor(l, f).length;
-    if (f === "framing") { sel[f] = [freshFraming()]; continue; }
-    if (SINGLE.has(f)) { sel[f] = [Math.floor(Math.random() * n)]; continue; }
     const shuffled = [...Array(n).keys()].sort(() => Math.random() - 0.5);
-    const max = Math.min(2, n);
-    sel[f] = shuffled.slice(0, 1 + Math.floor(Math.random() * max)).sort();
+    sel[f] = shuffled.slice(0, 1 + Math.floor(Math.random() * Math.min(2, n))).sort();
   }
   return { ...base, landscape: l.id, mood: weightedMood().id, sel, custom: {} };
 }

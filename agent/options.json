@@ -1,6 +1,6 @@
 {
   "app": "Dark Ambient Prompt Generator + Ambient Video Studio",
-  "generated": "2026-11-24T08:15:58.440Z",
+  "generated": "2026-11-25T04:14:01.011Z",
   "urls": {
     "generator": "./",
     "studio": "./studio.html",
@@ -51,7 +51,7 @@
     "STYLES": {
       "photo": {
         "label": "Fotorealistis",
-        "text": "A real photograph, not a painting or CGI: full-frame camera on a tripod, long exposure, deep focus, true monumental scale with no miniature look, natural light, weathered real materials, subtle film grain, low contrast, muted tones, no HDR. Quiet and meditative, a background for a long ambient music video."
+        "text": "A real photograph, not a painting or CGI: camera on a tripod, long exposure, deep focus, true monumental scale with no miniature look, natural light, weathered real materials, subtle film grain, low contrast, muted tones, no HDR. Quiet and meditative, a background for a long ambient music video."
       },
       "matte": {
         "label": "Matte Painting",
@@ -72,20 +72,29 @@
         "underwater spiral tower of stone",
         "flooded amphitheater carved into a cliff",
         "fallen colossal statue lying on the seabed",
-        "submerged brutalist research dome"
+        "submerged brutalist research dome",
+        "sunken lighthouse lying on its side",
+        "drowned colonnade of a vanished palace",
+        "submerged stone bridge with no shores",
+        "colossal sunken bell tower",
+        "underwater gate of a drowned city"
       ],
       "foreground": [
         "two or three low broken columns half-buried in silt",
         "rippled silt with a single fallen statue",
         "a field of pale sea anemone-like stone growths",
         "an ancient anchor chain trailing across the sand",
-        "the edge of a deep trench dropping into darkness"
+        "the edge of a deep trench dropping into darkness",
+        "a lone toppled column crusted with pale growths",
+        "a smooth boulder field fading into the murk"
       ],
       "decay": [
         "covered in silt and dark algae",
         "weathered, eroded stonework",
         "encrusted with pale coral-like growths",
-        "long ribbons of kelp hanging from its edges"
+        "long ribbons of kelp hanging from its edges",
+        "softened edges worn by currents",
+        "half buried in grey sand"
       ],
       "atmosphere": [
         "heavy underwater murk",
@@ -97,7 +106,9 @@
         "faint diffused light from far above",
         "thin wavering caustic light",
         "a single shaft of pale light from the surface",
-        "near darkness with a dim blue-green glow"
+        "near darkness with a dim blue-green glow",
+        "a pale cone of light from a distant opening above",
+        "faint bioluminescent-free cold twilight of the deep"
       ],
       "palette": "muted teal, abyssal navy, and slate grey",
       "medium": "Clearly deep underwater: blue-green water haze, suspended particles, no trees or land plants"
@@ -114,20 +125,29 @@
         "ring of giant standing stones",
         "abandoned observatory of red stone",
         "row of colossal gate pylons",
-        "giant ruined water tower of mud brick"
+        "giant ruined water tower of mud brick",
+        "lone colossal archway half sunk in a dune",
+        "abandoned caravanserai with collapsed domes",
+        "giant sundial of weathered stone",
+        "row of headless colossal statues",
+        "ruined desert citadel on a mesa"
       ],
       "foreground": [
         "one or two half-buried fallen pillars",
         "sharp wind-carved ripples in the sand",
         "a cracked dry riverbed",
         "bleached stone steps vanishing under the sand",
-        "a long low wall almost buried by a dune"
+        "a long low wall almost buried by a dune",
+        "a lone weathered milestone",
+        "pale bones of an ancient wall forming a line"
       ],
       "decay": [
         "wind-eroded stone",
         "dunes swallowing its base",
         "sandblasted, faceless carvings",
-        "cracked mud-brick walls"
+        "cracked mud-brick walls",
+        "edges rounded by centuries of wind",
+        "fine sand pouring from cracks"
       ],
       "atmosphere": [
         "thick dust haze",
@@ -139,7 +159,9 @@
         "a pale veiled sun behind dust",
         "flat overcast desert light",
         "low golden-grey light before dusk",
-        "cold blue light just after sunset"
+        "cold blue light just after sunset",
+        "hazy noon light with almost no shadows",
+        "a cold silver dawn over the dunes"
       ],
       "palette": "desaturated ochre, faded sepia, and dusty ash",
       "medium": "Clearly a vast dry desert: wind-blown sand in the air, everything dusted with sand, no vegetation"
@@ -156,20 +178,29 @@
         "ice-encased cathedral of black stone",
         "tilted lighthouse locked in sea ice",
         "massive frozen ship's hull",
-        "ring of frozen monoliths"
+        "ring of frozen monoliths",
+        "abandoned observatory dome on an ice ridge",
+        "colossal frozen statue of a seated figure",
+        "half-collapsed ice-bound monastery",
+        "endless frozen aqueduct",
+        "giant ring of black stone in the snow"
       ],
       "foreground": [
         "a path of cracked blue ice",
         "snow-covered fragments of broken arches",
         "wind-sculpted snow ridges",
         "frozen footprints of something long gone, half filled with snow",
-        "a frozen lake surface with trapped bubbles"
+        "a frozen lake surface with trapped bubbles",
+        "a half-buried iron fence line",
+        "deep wind-carved snow scallops"
       ],
       "decay": [
         "encased in thick ice and rime frost",
         "snow-drifted ruins",
         "long icicles hanging from every ledge",
-        "frost-cracked concrete"
+        "frost-cracked concrete",
+        "frost feathers growing on every edge",
+        "cracked by deep cold"
       ],
       "atmosphere": [
         "soft whiteout fog",
@@ -181,7 +212,9 @@
         "cold diffused arctic twilight",
         "a low pale sun barely above the horizon",
         "blue polar night with faint skylight",
-        "flat white overcast light"
+        "flat white overcast light",
+        "pale blue noon under thin cloud",
+        "the last pink-grey light of polar dusk"
       ],
       "palette": "icy pale blue, stark grey, and cold white",
       "medium": "Clearly a frozen world: ice crystals in the air, frost on every surface, nothing grows"
@@ -198,20 +231,29 @@
         "collapsed monastery on a hill",
         "giant moss-covered stone face",
         "endless overgrown staircase climbing a slope",
-        "derelict railway bridge over a ravine"
+        "derelict railway bridge over a ravine",
+        "roofless chapel of grey stone",
+        "colossal fallen statue overgrown with moss",
+        "abandoned stone lookout tower",
+        "ruined cloister with empty arches",
+        "long flight of mossy stairs to nowhere"
       ],
       "foreground": [
         "a moss-covered stone causeway",
         "still black water reflecting the scene",
         "a carpet of grey ferns and fallen leaves",
         "a single fallen trunk lying across the view",
-        "stepping stones across a dark stream"
+        "stepping stones across a dark stream",
+        "a carpet of wet black leaves",
+        "a low mossy wall leading into the fog"
       ],
       "decay": [
         "choked by dead vines and damp moss",
         "cracked wet stone",
         "roots splitting its walls apart",
-        "streaked with dark water stains"
+        "streaked with dark water stains",
+        "blanketed in thick velvet moss",
+        "dark water stains streaking down"
       ],
       "atmosphere": [
         "dense low-lying mist",
@@ -223,7 +265,9 @@
         "weak grey light through a dead canopy",
         "soft dawn light in the fog",
         "dim overcast afternoon light",
-        "cold blue dusk"
+        "cold blue dusk",
+        "grey diffused light after rain",
+        "a faint misty morning glow between trunks"
       ],
       "palette": "muted moss green, charcoal, and damp slate",
       "medium": "Clearly a dead wet forest: damp air, bare grey trunks fading into fog, no green leaves"
@@ -240,20 +284,29 @@
         "giant crashed vessel overgrown with crystals",
         "field of enormous geometric pylons",
         "vast domed habitat cracked open",
-        "impossibly tall needle tower"
+        "impossibly tall needle tower",
+        "colossal half-buried sphere",
+        "endless alien colonnade of black pillars",
+        "giant abandoned dish antenna",
+        "monolithic stepped structure of pale stone",
+        "tilted megastructure ring on the horizon"
       ],
       "foreground": [
         "two or three smaller weathered monoliths",
         "glassy black rock reflecting the sky",
         "fine grey dust with geometric fragments",
         "a shallow crater rim",
-        "pale crystalline shards on the ground"
+        "pale crystalline shards on the ground",
+        "smooth wind-polished stones",
+        "a field of small identical pillars"
       ],
       "decay": [
         "weathered alien metal",
         "dust-covered geometric carvings",
         "pitted by ancient impacts",
-        "veins of dull crystal through its surface"
+        "veins of dull crystal through its surface",
+        "surfaces etched by millennia of dust storms",
+        "half sunk into fine regolith"
       ],
       "atmosphere": [
         "thin cosmic dust",
@@ -265,7 +318,9 @@
         "distant dim starlight",
         "a huge pale planet low in the sky",
         "two faint suns behind haze",
-        "the cold glow of a ringed planet"
+        "the cold glow of a ringed planet",
+        "a dim double sunset haze",
+        "cold light reflected from a vast gas giant"
       ],
       "palette": "pitch black, muted indigo, and cold silver",
       "medium": "Clearly another planet: thin cold atmosphere, alien rock forms, no plants or water"
@@ -282,20 +337,29 @@
         "colossal concrete stairwell",
         "deserted elevated highway ending in the air",
         "endless parking structure",
-        "vast empty cooling tower"
+        "vast empty cooling tower",
+        "empty multistory library with endless shelves",
+        "abandoned subway platform hall",
+        "deserted brutalist church",
+        "endless corridor of identical doors",
+        "empty concrete stadium"
       ],
       "foreground": [
         "a flooded floor reflecting like a dark mirror",
         "a few identical concrete pillars",
         "tiled floor with shallow still puddles",
         "rusted railing along a ledge",
-        "a cracked concrete plaza"
+        "a cracked concrete plaza",
+        "a single overturned chair",
+        "a long wet floor reflecting the ceiling"
       ],
       "decay": [
         "peeling damp concrete",
         "rusted steel beams",
         "stagnant still water",
-        "water-stained, mold-darkened walls"
+        "water-stained, mold-darkened walls",
+        "flaking paint and exposed rebar",
+        "moss creeping across concrete"
       ],
       "atmosphere": [
         "heavy urban smog",
@@ -307,7 +371,9 @@
         "dim overcast skylight",
         "pale light through high skylights",
         "cold fluorescent-like grey daylight",
-        "soft blue hour light"
+        "soft blue hour light",
+        "cold light through dusty high windows",
+        "grey light from a collapsed roof"
       ],
       "palette": "washed-out concrete grey, muted cyan, and rust",
       "medium": "Clearly an abandoned megastructure: still water, damp concrete, faint reflections, no plants or furniture"
@@ -322,18 +388,26 @@
         "row of giant pillars standing in the water",
         "half-collapsed marble pavilion",
         "giant stone sphere resting on the salt",
-        "endless colonnade of white stone"
+        "endless colonnade of white stone",
+        "lone white staircase rising into the sky",
+        "colossal hollow cube of white stone",
+        "line of slender obelisks",
+        "empty white amphitheater"
       ],
       "foreground": [
         "hexagonal salt crust patterns",
         "a mirror-like sheet of water",
         "a single line of stepping stones",
-        "salt-crusted stone fragments"
+        "salt-crusted stone fragments",
+        "a single shallow ripple line",
+        "scattered white salt crystals"
       ],
       "decay": [
         "crusted with white salt",
         "bleached and cracked",
-        "streaked with mineral stains"
+        "streaked with mineral stains",
+        "salt bloom creeping up its base",
+        "pitted by mineral crust"
       ],
       "atmosphere": [
         "soft white haze",
@@ -343,7 +417,9 @@
       "lighting": [
         "pale overcast light",
         "soft pastel twilight",
-        "flat silver light"
+        "flat silver light",
+        "blinding soft white overcast",
+        "a faint lavender dusk"
       ],
       "palette": "bone white, pale grey-blue, and soft silver",
       "medium": "Clearly a salt flat: perfectly flat ground, thin water reflecting the sky, no vegetation"
@@ -358,18 +434,26 @@
         "ruined temple of black stone",
         "giant column of cooled lava shaped like a tower",
         "half-buried brutalist bunker",
-        "ring of basalt monoliths"
+        "ring of basalt monoliths",
+        "half-buried basalt pyramid",
+        "colossal broken stone mask",
+        "abandoned observatory on a cinder cone",
+        "row of scorched obelisks"
       ],
       "foreground": [
         "fields of grey ash with rippled patterns",
         "cracked black lava crust",
         "a few charred stone fragments",
-        "a long trench in the ash"
+        "a long trench in the ash",
+        "glassy obsidian shards",
+        "a frozen river of black lava"
       ],
       "decay": [
         "buried in grey ash",
         "scorched and cracked stone",
-        "streaked with sulfur stains"
+        "streaked with sulfur stains",
+        "coated in fine grey ash",
+        "heat-cracked surfaces"
       ],
       "atmosphere": [
         "slowly falling ash",
@@ -379,7 +463,9 @@
       "lighting": [
         "dim grey light through ash clouds",
         "a faint distant red glow on the horizon",
-        "cold dusk light"
+        "cold dusk light",
+        "a dull orange glow under ash clouds",
+        "flat grey light through falling ash"
       ],
       "palette": "charcoal black, ash grey, and a hint of dull rust",
       "medium": "Clearly a volcanic wasteland: black ash ground, ash in the air, no vegetation"
@@ -394,18 +480,26 @@
         "giant stone breakwater gate",
         "colossal statue standing in the shallow sea",
         "derelict concrete pier stretching into fog",
-        "ruined cliffside monastery"
+        "ruined cliffside monastery",
+        "colossal sea wall disappearing into fog",
+        "abandoned stone observatory on the shore",
+        "giant stranded stone figure facing the sea",
+        "half-submerged chapel"
       ],
       "foreground": [
         "wet black pebbles",
         "flat rocks washed by calm water",
         "the edge of a dark tidal pool",
-        "a line of old wooden posts in the water"
+        "a line of old wooden posts in the water",
+        "smooth grey sand with a thin wash of water",
+        "a line of broken stone steps into the sea"
       ],
       "decay": [
         "weathered by salt and wind",
         "covered in dark barnacles",
-        "rusted iron fittings"
+        "rusted iron fittings",
+        "stained by salt spray",
+        "softened by endless waves"
       ],
       "atmosphere": [
         "dense sea fog",
@@ -415,7 +509,9 @@
       "lighting": [
         "flat overcast sea light",
         "soft grey dawn",
-        "pale light breaking through fog"
+        "pale light breaking through fog",
+        "silver light on a calm sea",
+        "a muted blue dawn over the water"
       ],
       "palette": "slate blue, cold grey, and wet black",
       "medium": "Clearly a cold coast: calm grey sea, wet rocks, sea fog, no boats"
@@ -430,18 +526,26 @@
         "forgotten underground temple",
         "colossal carved face in the cavern wall",
         "abandoned mining tower",
-        "underground lake palace"
+        "underground lake palace",
+        "colossal stone bridge across a chasm",
+        "carved staircase spiraling into the dark",
+        "underground cathedral hall of pillars",
+        "abandoned water cistern hall"
       ],
       "foreground": [
         "still black underground water",
         "smooth wet rock",
         "broken carved steps",
-        "a narrow rock ledge"
+        "a narrow rock ledge",
+        "a still mirror pool",
+        "a row of broken stone basins"
       ],
       "decay": [
         "covered in mineral deposits",
         "stalactites growing over its edges",
-        "damp, dripping stone"
+        "damp, dripping stone",
+        "veined with white mineral flows",
+        "slick with seeping water"
       ],
       "atmosphere": [
         "thin cave mist",
@@ -451,10 +555,150 @@
       "lighting": [
         "a single shaft of daylight from an opening far above",
         "faint cold light reflected from water",
-        "a dim glow from a distant opening"
+        "a dim glow from a distant opening",
+        "a narrow beam from a crack in the ceiling",
+        "soft light reflected off wet walls"
       ],
       "palette": "deep umber, cold grey, and faint teal",
       "medium": "Clearly deep underground: a rock ceiling far above, damp air, no sky"
+    },
+    {
+      "id": "steppe",
+      "label": "Padang Kabut (Misty Steppe)",
+      "landscape": "an endless misty grassland steppe",
+      "structure": [
+        "lone colossal stone archway",
+        "abandoned stone watchtower",
+        "ring of weathered standing stones",
+        "half-collapsed stone farmhouse of giant scale",
+        "colossal stone head lying in the grass",
+        "endless low wall crossing the plain"
+      ],
+      "foreground": [
+        "tall pale grass bending slightly",
+        "a worn stone path through the grass",
+        "a lone boulder with lichen"
+      ],
+      "decay": [
+        "covered in grey-green lichen",
+        "grass growing from every crack",
+        "softened by centuries of rain"
+      ],
+      "atmosphere": [
+        "low drifting mist over the grass",
+        "soft rain haze",
+        "layered fog fading into the distance"
+      ],
+      "lighting": [
+        "soft overcast morning light",
+        "pale gold light behind mist",
+        "cold blue twilight"
+      ],
+      "palette": "muted sage green, pale straw, and soft grey",
+      "medium": "Clearly a vast open grassland: pale grass to the horizon, damp air, no trees or animals"
+    },
+    {
+      "id": "mountain",
+      "label": "Pegunungan (Alpine Heights)",
+      "landscape": "remote high mountains above the clouds",
+      "structure": [
+        "abandoned monastery clinging to a cliff",
+        "colossal stone stairway carved up a ridge",
+        "ruined fortress on a knife-edge peak",
+        "giant stone statue carved into the mountain",
+        "lone observatory on a summit"
+      ],
+      "foreground": [
+        "jagged rocks dusted with snow",
+        "a sea of clouds below the ridge",
+        "a narrow stone ledge"
+      ],
+      "decay": [
+        "weathered by wind and frost",
+        "half buried in old snow",
+        "streaked with dark meltwater"
+      ],
+      "atmosphere": [
+        "a sea of clouds filling the valleys",
+        "thin cold mist drifting over ridges",
+        "layered peaks fading into haze"
+      ],
+      "lighting": [
+        "cold light above the clouds",
+        "pale dawn on distant peaks",
+        "soft overcast high-altitude light"
+      ],
+      "palette": "slate grey, cold white, and pale blue",
+      "medium": "Clearly high mountains: thin cold air, rocky ridges, clouds below, no vegetation"
+    },
+    {
+      "id": "lake",
+      "label": "Danau Tenang (Still Lake)",
+      "landscape": "a perfectly still mountain lake",
+      "structure": [
+        "half-submerged stone temple",
+        "colossal stone pavilion standing in the water",
+        "drowned village tower",
+        "long stone causeway crossing the lake",
+        "giant stone statue rising from the water",
+        "lone floating-looking stone platform"
+      ],
+      "foreground": [
+        "glassy water reflecting everything",
+        "a few submerged stones",
+        "reeds at the water's edge"
+      ],
+      "decay": [
+        "water lines staining its walls",
+        "green algae at the waterline",
+        "softened and weathered stone"
+      ],
+      "atmosphere": [
+        "thin mist hovering on the water",
+        "morning haze over the lake",
+        "layered fog over the far shore"
+      ],
+      "lighting": [
+        "soft dawn light",
+        "flat silver overcast",
+        "deep blue hour"
+      ],
+      "palette": "deep teal, slate, and pale silver",
+      "medium": "Clearly a still lake: a mirror-like water surface with perfect reflections, no boats"
+    },
+    {
+      "id": "canyon",
+      "label": "Ngarai (Canyon)",
+      "landscape": "a vast silent canyon",
+      "structure": [
+        "colossal facade carved into the canyon wall",
+        "ancient stone bridge spanning the canyon",
+        "abandoned cliff dwelling city",
+        "giant stone gate between two cliffs",
+        "lone tower on a rock pillar"
+      ],
+      "foreground": [
+        "layered red rock ledges",
+        "a dry riverbed of smooth stones",
+        "a narrow path along the cliff"
+      ],
+      "decay": [
+        "eroded by wind into soft layers",
+        "streaked with desert varnish",
+        "cracked and partly collapsed"
+      ],
+      "atmosphere": [
+        "dust haze in the depths",
+        "thin morning mist in the canyon",
+        "layered cliffs fading into haze"
+      ],
+      "lighting": [
+        "indirect light bouncing between cliffs",
+        "soft light before sunrise",
+        "shadowed afternoon light"
+      ],
+      "palette": "muted terracotta, dusty rose, and deep shadow brown",
+      "medium": "Clearly a deep canyon: towering layered rock walls, dry air, no vegetation"
     }
   ],
   "moods": [
@@ -560,6 +804,31 @@
     {
       "label": "Off-center tinggi",
       "text": "The structure placed high in the right third, a long empty slope or plain leading up to it from the bottom-left; 35mm."
+    },
+    {
+      "label": "Dari kejauhan, kabut depan",
+      "text": "Seen through a soft veil of foreground mist, the structure emerging in the middle distance; 70mm."
+    },
+    {
+      "label": "Over-the-edge",
+      "fg": false,
+      "text": "Looking over a crumbling edge in the near foreground, steeply down and across to the structure; 24mm."
+    },
+    {
+      "label": "Bayangan panjang",
+      "text": "Low raking light casting one long shadow of the structure across the ground toward the camera; 35mm."
+    },
+    {
+      "label": "Simetris jauh",
+      "text": "Perfectly centered but tiny, a strict symmetrical composition with vast emptiness on both sides; 50mm."
+    },
+    {
+      "label": "Vertikal sempit",
+      "text": "A narrow vertical slice of view between two dark masses in the foreground, the structure framed in the gap; 85mm."
+    },
+    {
+      "label": "Bertingkat ke cakrawala",
+      "text": "Several weathered steps or terraces rise from the foreground toward the structure on the horizon; 28mm."
     }
   ],
   "twists": [
@@ -578,7 +847,17 @@
     "a perfectly round pool of still water lies before it",
     "rows of identical smaller copies of it stand in the far distance",
     "it is wrapped in vast tattered sheets of fabric moving slightly",
-    "part of it has been turned upside down and rests on its own roof"
+    "part of it has been turned upside down and rests on its own roof",
+    "a perfectly round hole in the ground mirrors its shape",
+    "one of its windows frames the sky on the other side",
+    "a lone tree, long dead, grows straight out of its roof",
+    "a vast spiral staircase winds around its exterior",
+    "its reflection shows it whole while the real one is ruined",
+    "a thin waterfall falls silently from one of its openings",
+    "a giant hand of stone emerges from the ground beside it",
+    "it is perfectly balanced on a narrow base, defying gravity",
+    "fragments of it hang suspended in the air, motionless",
+    "long ribbons of mist pour out of its doorways"
   ],
   "emptiness": [
     "endless negative space",
@@ -586,7 +865,9 @@
     "layers of haze receding into nothing",
     "a silent emptiness stretching forever",
     "a vast, featureless plain",
-    "a horizon lost entirely in fog"
+    "a horizon lost entirely in fog",
+    "a vast blank space that seems to go on forever",
+    "silence you can almost see"
   ],
   "aspects": [
     "16:9",

@@ -5,8 +5,10 @@ Web statis untuk merakit prompt gambar bertema **kenopsia, megalophobia, liminal
 ## Fitur
 - Prompt khusus **Nano Banana** (Gemini image): kalimat naratif, bukan daftar kata kunci; larangan ditulis sebagai deskripsi (tanpa negative prompt); aspect ratio disebut dalam teks
 - Dioptimalkan untuk latar musik ambient: subjek jelas sebagai titik fokus (sepertiga tinggi frame, siluet dipisahkan cahaya samar), elemen latar depan yang menuntun mata, ruang kosong lega, cahaya redup, kontras rendah
-- 10 landscape dengan thumbnail (Abyssal, Desert, Frozen, Forest, Alien, Urban, Salt Flat, Volcanic, Foggy Coast, Cavern), masing-masing 6–8 struktur, 4–5 foreground, 4 pencahayaan; 4 nuansa: Ambient Solitude (default), Kenopsia, Megalophobia, Liminal Space
-- Pilih detail (structure, foreground, decay, atmosphere, lighting, framing, kejutan, emptiness). Framing (16 pola komposisi & lensa) dan kejutan (15 detail tak terduga) dipilih acak agar hasil tidak monoton atau tulis nilai custom sendiri
+- 14 landscape dengan thumbnail (Abyssal, Desert, Frozen, Forest, Alien, Urban, Salt Flat, Volcanic, Foggy Coast, Cavern, Misty Steppe, Alpine Heights, Still Lake, Canyon), masing-masing 5–13 struktur, 3–7 foreground, 3–6 pencahayaan; 4 nuansa
+- Dimensi tambahan bebas-konflik: material bangunan (14), pengaruh arsitektur (16), aksen warna (9), karakter kamera/film (6)
+- Anti-pengulangan: pilihan acak menghindari opsi yang baru dipakai (diingat antar sesi): Ambient Solitude (default), Kenopsia, Megalophobia, Liminal Space
+- Pilih detail (structure, foreground, decay, atmosphere, lighting, framing, kejutan, emptiness). Framing (22 pola komposisi & lensa) dan kejutan (25 detail tak terduga) dipilih acak agar hasil tidak monoton atau tulis nilai custom sendiri
 - **Auto dari judul audio**: ketik judul (Inggris/Indonesia), generator mendeteksi kata kunci untuk memilih landscape, nuansa, detail dan kalimat suasana. Memahami bank kata judul ambient: mode/suasana (Lydian–Phrygian), kecerahan, citra luar angkasa (jadi langit), melodi, tujuan, bentuk lagu, nama chapter; kata terlarang (432, Hz, binaural, healing, …) diabaikan. Judul yang sama selalu memberi hasil yang sama. Aturannya ada di `RULES` dalam `js/title.js`
 - Gaya **Fotorealistis** (default) atau Matte Painting
 - Panel **Overlay & Motion**: catatan editing, prompt aset overlay (latar hitam untuk blend Screen) dan unduh config untuk video

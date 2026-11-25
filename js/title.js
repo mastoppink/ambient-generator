@@ -1,5 +1,5 @@
-import { LANDSCAPES, MOODS } from "./data.js?v=19";
-import { ALL_FIELDS, SINGLE, optionsFor, getLandscape } from "./generator.js?v=19";
+import { LANDSCAPES, MOODS } from "./data.js?v=21";
+import { ALL_FIELDS, SINGLE, optionsFor, getLandscape } from "./generator.js?v=21";
 
 /*
  * Title → prompt rules (English + Indonesian).
@@ -35,6 +35,10 @@ const RULES = [
   R("landscape", ["ash", "ashes", "volcano", "volcanic", "lava", "ember", "embers", "obsidian", "abu", "vulkanik", "gunung api"], { land: { volcanic: 2 } }),
   R("landscape", ["coast", "shore", "lighthouse", "harbor", "harbour", "pier", "cliff", "cliffs", "pantai", "pesisir", "mercusuar", "dermaga", "tebing"], { land: { coast: 2 } }),
   R("landscape", ["cave", "caves", "cavern", "underground", "grotto", "gua", "goa", "bawah tanah"], { land: { cavern: 2 } }),
+  R("landscape", ["grass", "grassland", "steppe", "meadow", "plain", "plains", "prairie", "padang", "rumput", "sabana"], { land: { steppe: 2 } }),
+  R("landscape", ["mountain", "mountains", "peak", "peaks", "summit", "alpine", "ridge", "above the clouds", "gunung", "puncak", "pegunungan"], { land: { mountain: 2 } }),
+  R("landscape", ["lake", "pond", "still water", "mirror lake", "danau", "telaga"], { land: { lake: 2 } }),
+  R("landscape", ["canyon", "gorge", "ravine", "mesa", "cliff city", "ngarai", "jurang", "lembah"], { land: { canyon: 2 } }),
   R("landscape", ["city", "urban", "concrete", "mall", "hallway", "corridor", "backrooms", "station", "metro", "subway", "poolrooms", "megablock", "kota", "lorong", "beton", "stasiun", "gedung"], { land: { urban: 2 } }),
 
   /* ---------- 1. Modes → mood + brightness ---------- */
@@ -174,7 +178,7 @@ export function stateFromTitle(title, base) {
   const sel = {};
   for (const f of ALL_FIELDS) {
     const opts = optionsFor(l, f);
-    const scorable = f !== "framing" && f !== "twist";
+    const scorable = !["framing", "twist", "material", "influence", "accent", "film"].includes(f);
     const scored = opts.map((o, i) => [i, scorable ? optionScore(norm, o) : 0]).filter(([, s]) => s > 0).sort((a, b) => b[1] - a[1]);
     if (SINGLE.has(f)) {
       sel[f] = [scored.length ? scored[0][0] : Math.floor(rand() * opts.length)];

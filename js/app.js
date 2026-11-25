@@ -1,13 +1,13 @@
-import { LANDSCAPES, MOODS, ASPECTS, REVISIONS } from "./data.js?v=19";
+import { LANDSCAPES, MOODS, ASPECTS, REVISIONS } from "./data.js?v=21";
 import {
   ALL_FIELDS, SINGLE, optionsFor, getLandscape, defaultSelection, buildPrompt, randomState, serialize, parse,
-} from "./generator.js?v=19";
-import { stateFromTitle } from "./title.js?v=19";
-import { overlayPlan, overlayNotes, overlayAssetPrompts, videoConfig } from "./overlays.js?v=19";
+} from "./generator.js?v=21";
+import { stateFromTitle } from "./title.js?v=21";
+import { overlayPlan, overlayNotes, overlayAssetPrompts, videoConfig } from "./overlays.js?v=21";
 
 const $ = (s) => document.querySelector(s);
 const FIELD_LABELS = {
-  framing: "Framing", twist: "Kejutan", structure: "Structure", foreground: "Foreground", decay: "Decay & Texture", atmosphere: "Atmosphere & Haze", lighting: "Lighting", emptiness: "Emptiness",
+  framing: "Framing", twist: "Kejutan", material: "Material", influence: "Pengaruh arsitektur", accent: "Aksen warna", film: "Karakter kamera/film", structure: "Structure", foreground: "Foreground", decay: "Decay & Texture", atmosphere: "Atmosphere & Haze", lighting: "Lighting", emptiness: "Emptiness",
 };
 const HISTORY_KEY = "dap-history";
 // ?title=... (e.g. from an AI agent) generates straight from an audio title. Read before the URL is rewritten.

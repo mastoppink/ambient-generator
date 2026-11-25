@@ -19,6 +19,7 @@ export const PRESETS = {
 export const presetFor = (landscape) => ({
   abyssal: "tealfog", desert: "sepia", frozen: "coldsteel", forest: "filmic", alien: "moonlight",
   urban: "bleach", saltflat: "dreamy", volcanic: "ember", coast: "coldsteel", cavern: "filmic",
+  steppe: "filmic", mountain: "coldsteel", lake: "tealfog", canyon: "sepia",
 }[landscape] || "filmic");
 
 const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16) / 255);
