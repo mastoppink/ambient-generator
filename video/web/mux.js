@@ -83,7 +83,9 @@ export async function muxLoopWithAudio(loopBlob, audioFile, { writable, onProgre
   const vSrc = new EncodedVideoPacketSource(vTrack.codec);
   out.addVideoTrack(vSrc, { frameRate: vTrack.frameRate || undefined });
 
-  const passthrough = format.getSupportedAudioCodecs().includes(aTrack.codec) && aTrack.codec !== "pcm-s16";
+  // Only copy AAC as-is. MP4 can also hold PCM (24-bit/float WAV), FLAC, Opus and MP3, but many players
+  // (QuickTime, TVs, some uploads) play those silently, so everything else is re-encoded to AAC.
+  const passthrough = aTrack.codec === "aac";
   let aSrc;
   if (passthrough) {
     aSrc = new EncodedAudioPacketSource(aTrack.codec);
